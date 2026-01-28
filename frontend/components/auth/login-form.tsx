@@ -1,5 +1,6 @@
 "use client";
 
+import { Info } from "lucide-react";
 import { useState } from "react";
 import { LoginSchema } from "@/schemas";
 import CardWrapper from "./card-wrapper";
@@ -13,39 +14,50 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
 
 export const LoginForm = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const [user, setUser] = useState<LoginFormValues | null>(null);
-
   const handleLogin = async (data: LoginFormValues) => {
+    setIsLoading(true);
+
     try {
       const response = await fetch("http://localhost:5000/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
       const result = await response.json();
-      setUser(result.data);
-      alert("Login successful!");
-      console.log("Login successful", result);
-      form.reset();
+
+      if (!response.ok) {
+        form.setError("root", {
+          type: "manual",
+          message: result.message || "Invalid email or password",
+        });
+        return;
+      }
+      router.push("/dashboard");
     } catch (error) {
-      console.error("Login failed", error);
+      form.setError("root", {
+        type: "manual",
+        message: "Network error. Please check your connection",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,6 +75,12 @@ export const LoginForm = () => {
             className="space-y-5 w-full"
             onSubmit={form.handleSubmit(handleLogin)}
           >
+            {form.formState.errors.root && (
+              <div className="flex justify-center items-center gap-x-3  text-red-600 px-4 py-3 rounded bg-red-200 ">
+                <Info className="text-red" size={20}/>{form.formState.errors.root.message}
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="email"
@@ -74,11 +92,10 @@ export const LoginForm = () => {
                       {...field}
                       placeholder="john.doe@example.com"
                       type="email"
+                      disabled={isLoading}
                     />
                   </FormControl>
-                  <FormMessage>
-                    {form.formState.errors.email?.message}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -94,17 +111,16 @@ export const LoginForm = () => {
                       {...field}
                       placeholder="Enter Password"
                       type="password"
+                      disabled={isLoading}
                     />
                   </FormControl>
-                  <FormMessage>
-                    {form.formState.errors.password?.message}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button className="w-full" type="submit">
-              Login
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>

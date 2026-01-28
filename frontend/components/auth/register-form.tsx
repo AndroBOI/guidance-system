@@ -35,6 +35,9 @@ const RegisterForm = () => {
         body: JSON.stringify(data),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

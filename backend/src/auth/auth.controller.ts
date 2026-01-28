@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthDto } from './dto';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -8,11 +9,23 @@ export class AuthController {
 
   @Post('signup')
   signUp(@Body() authDto: AuthDto) {
-    return this.authService.signUp(authDto.email, authDto.password);
+    return this.authService.signUp(authDto);
   }
 
   @Post('signin')
-  signIn(@Body() authDto: AuthDto) {
-    return this.authService.singIn(authDto.email, authDto.password);
+  async signIn(
+    @Body() authDto: AuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.authService.signIn(authDto);
+
+    res.cookie('access_token', token.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 15 * 60 * 1000,
+      sameSite: 'lax',
+      path: '/',
+    });
+    return token;
   }
 }
