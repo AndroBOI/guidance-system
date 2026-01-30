@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider     = "prisma-client"
   output       = "../generated/prisma"
@@ -14,10 +8,69 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
+enum AppointmentStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum Concern {
+  ACADEMIC
+  PERSONAL
+  HEALTH
+  CAREER
+  OTHER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
+  id                   String        @id @default(cuid())
+  email                String        @unique @db.VarChar(60)
+  password             String
+  role                 Role          @default(USER)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  appointments         Appointment[]
+  profile              Profile?
+  approvedAppointments Appointment[] @relation("AdminApproved")
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @unique
+  name       String?
+  age        Int?
+  gender     Gender?
+  department String?
+  year       Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  user        User              @relation(fields: [userId], references: [id])
+  userId      String
+  title       String @db.VarChar(100)
+  concern     Concern
+  description String? @db.VarChar(500)
+  date        DateTime
+  status      AppointmentStatus @default(PENDING)
+  approvedBy  User?             @relation("AdminApproved", fields: [adminId], references: [id])
+  adminId     String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }

@@ -16,10 +16,12 @@ import { Button } from "../ui/button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 type RegisterFormValues = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
+  const router = useRouter();
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: { email: "", password: "" },
@@ -37,7 +39,7 @@ const RegisterForm = () => {
 
       console.log("Response status:", response.status);
       console.log("Response ok:", response.ok);
-      
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -45,6 +47,7 @@ const RegisterForm = () => {
       const result = await response.json();
       setUser(result);
       alert("Registration successful!");
+      router.push("/login");
       console.log("Registration successful", result);
       form.reset();
     } catch (error) {

@@ -15,7 +15,7 @@ export default function Dashboard() {
     const fetchUser = async () => {
       try {
         const res = await fetch("http://localhost:5000/users/me", {
-          credentials: "include", 
+          credentials: "include",
         });
 
         if (!res.ok) throw new Error("Unauthorized");
@@ -23,7 +23,7 @@ export default function Dashboard() {
         const data = await res.json();
         setUser(data);
       } catch (err) {
-        router.push("/login"); 
+        router.push("/login");
       }
     };
 
@@ -33,7 +33,7 @@ export default function Dashboard() {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="min-h-screen flex justify-center items-center">
       <h1>Welcome, {user.email}</h1>
       <p>Your dashboard content goes here.</p>
     </div>

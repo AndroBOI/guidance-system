@@ -50,6 +50,10 @@ export const LoginForm = () => {
         });
         return;
       }
+
+      console.log("Login successful, checking cookies...");
+      console.log("Document cookies:", document.cookie);
+
       router.push("/dashboard");
     } catch (error) {
       form.setError("root", {
@@ -77,7 +81,8 @@ export const LoginForm = () => {
           >
             {form.formState.errors.root && (
               <div className="flex justify-center items-center gap-x-3  text-red-600 px-4 py-3 rounded bg-red-200 ">
-                <Info className="text-red" size={20}/>{form.formState.errors.root.message}
+                <Info className="text-red" size={20} />
+                {form.formState.errors.root.message}
               </div>
             )}
 

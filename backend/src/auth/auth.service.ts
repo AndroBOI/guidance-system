@@ -46,16 +46,18 @@ export class AuthService {
       throw new ForbiddenException('Credentials incorrect');
     }
 
-    return this.signToken(user.id, user.email);
+    return this.signToken(user.id, user.email, user.role);
   }
 
   async signToken(
     userId: string,
     email: string,
+    role: 'ADMIN' | 'USER' = 'USER',
   ): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
       email,
+      role,
     };
 
     const secret = this.config.get<string>('JWT_SECRET');
