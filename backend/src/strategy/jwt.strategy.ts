@@ -44,6 +44,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     console.log('User validated:', user.email);
 
-    return { ...user, role: payload.role };
+    return { sub: user.id, email: user.email, role: payload.role };
   }
 }
