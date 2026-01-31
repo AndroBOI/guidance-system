@@ -22,7 +22,6 @@ const CardWrapper = ({
   children,
   cardTitle,
   cardDescription,
-  cardButtonText,
   footerText,
   backButtonHref,
 }: CardWrapperProps) => {

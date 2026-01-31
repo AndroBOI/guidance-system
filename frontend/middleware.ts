@@ -29,6 +29,8 @@ export async function middleware(req: NextRequest) {
 
     console.log("✅ Token valid, role:", jwtPayload.role);
 
+    
+
     if (path.startsWith("/admin") && jwtPayload.role !== "ADMIN") {
       console.log("🚫 Not admin, blocking access to admin route");
       return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -44,8 +46,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/profile",
-    "/profile/history",
+    "/profile/:path*",
     "/dashboard/:path*",
     "/admin/:path*",
   ],
