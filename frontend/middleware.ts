@@ -29,11 +29,17 @@ export async function middleware(req: NextRequest) {
 
     console.log("✅ Token valid, role:", jwtPayload.role);
 
-    
-
     if (path.startsWith("/admin") && jwtPayload.role !== "ADMIN") {
       console.log("🚫 Not admin, blocking access to admin route");
       return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    if (
+      (path.startsWith("/profile") || path.startsWith("/dashboard")) &&
+      jwtPayload.role !== "USER"
+    ) {
+      console.log("🚫 Admin trying to access user route, blocking");
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
     console.log("✨ Access granted");
@@ -45,9 +51,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/profile/:path*",
-    "/dashboard/:path*",
-    "/admin/:path*",
-  ],
+  matcher: ["/profile/:path*", "/dashboard/:path*", "/admin/:path*"],
 };

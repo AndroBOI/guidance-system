@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Card } from "../ui/card";
+import { Card, CardTitle, CardHeader } from "../ui/card";
 import { Info } from "lucide-react";
 import { useState } from "react";
 import { ProfileSchema } from "@/schemas";
@@ -87,6 +87,9 @@ export const ProfileForm = () => {
   return (
     <div className="flex min-h-screen justify-center items-center px-5">
       <Card className="w-full max-w-sm px-5 py-6">
+        <CardHeader className="text-center">
+          <CardTitle>We lowkey genuinely need your Info Twin</CardTitle>{" "}
+        </CardHeader>
         <Form {...form}>
           <form
             className="space-y-5 w-full"
