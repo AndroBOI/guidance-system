@@ -1,41 +1,29 @@
+// app/dashboard/page.tsx
 "use client";
-
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-
-interface User {
-  email: string;
-}
+import { useEffect } from "react";
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/users/me", {
-          credentials: "include",
-        });
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
-        if (!res.ok) throw new Error("Unauthorized");
-
-        const data = await res.json();
-        setUser(data);
-      } catch (err) {
-        router.push("/login");
-      }
-    };
-
-    fetchUser();
-  }, [router]);
-
-  if (!user) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <h1>Welcome, {user.email}</h1>
-      <p>Your dashboard content goes here.</p>
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome, {user.email}</p>
+      <p>Role: {user.role}</p>
+      <Button onClick={logout}>Logout</Button>
     </div>
   );
 }
