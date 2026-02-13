@@ -18,11 +18,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
 
 export const LoginForm = () => {
   const router = useRouter();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -34,31 +36,17 @@ export const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        form.setError("root", {
-          type: "manual",
-          message: result.message || "Invalid email or password",
-        });
-        return;
-      }
-
-      console.log("Login successful, checking cookies...");
-      console.log("Document cookies:", document.cookie);
-
+      console.log("📝 Submitting login form...");
+      await login(data.email, data.password);
+      console.log("✅ Login complete, redirecting...");
       router.push("/dashboard");
     } catch (error) {
+      console.error("❌ Login failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Invalid email or password";
       form.setError("root", {
         type: "manual",
-        message: "Network error. Please check your connection",
+        message: errorMessage || "Invalid email or password",
       });
     } finally {
       setIsLoading(false);

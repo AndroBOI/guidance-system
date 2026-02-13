@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Dashboard() {
   const { user, loading, logout } = useAuth();
@@ -15,7 +16,7 @@ export default function Dashboard() {
     }
   }, [user, loading, router]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="h-screen flex justify-center items-center"><Spinner className="size-20 text-primary"/></div>;
   if (!user) return null;
 
   return (

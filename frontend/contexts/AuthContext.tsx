@@ -18,6 +18,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  login: (email: string, password: string) => Promise<void>; // ✅ Added
   logout: () => Promise<void>;
 }
 
@@ -27,34 +28,57 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+  const fetchUser = async () => {
+    try {
+      console.log("📡 Fetching user...");
+      const res = await api.get<User>("/users/me");
+      console.log("✅ User fetched:", res.data);
+      setUser(res.data);
+    } catch (error) {
+      console.log("❌ Failed to fetch user");
+      setUser(null);
+    }
+  };
 
-      try {
-        const res = await api.get<User>("/users/me");
-        setUser(res.data);
-      } catch (err) {
-        const error = err as { response?: { status?: number } };
-        if (error.response?.status !== 401) {
-          setUser(null);
-        }
-      } finally {
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUser = async () => {
+      await fetchUser();
+      if (isMounted) {
+        console.log("🏁 Initial load complete");
         setLoading(false);
       }
     };
 
-    fetchUser();
+    loadUser();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  const login = async (email: string, password: string) => {
+    console.log("🔐 Logging in...");
+    await api.post("/auth/signin", { email, password });
+    console.log("✅ Login successful, fetching user...");
+    await fetchUser();
+    console.log("✅ User loaded");
+  };
+
   const logout = async () => {
-    await api.post("/auth/logout");
+    console.log("🚪 Logging out...");
+    try {
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.log("⚠️ Logout failed but clearing user anyway");
+    }
     setUser(null);
     window.location.href = "/login";
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
