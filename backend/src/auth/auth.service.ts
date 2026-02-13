@@ -5,6 +5,7 @@ import { AuthDto } from './dto';
 import { PrismaClientKnownRequestError } from 'generated/prisma/internal/prismaNamespace';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
         data: { email: dto.email, password: hash },
       });
 
-      return this.signToken(user.id, user.email);
+      return this.signToken(user.id, user.email, user.role);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
