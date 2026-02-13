@@ -53,7 +53,7 @@ export class AuthService {
     userId: string,
     email: string,
     role: 'ADMIN' | 'USER' = 'USER',
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = {
       sub: userId,
       email,
@@ -61,14 +61,62 @@ export class AuthService {
     };
 
     const secret = this.config.get<string>('JWT_SECRET');
+    const refreshSecret = this.config.get<string>('JWT_REFRESH_SECRET');
 
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret: secret,
-    });
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwt.signAsync(payload, {
+        expiresIn: '15m',
+        secret: secret,
+      }),
+      this.jwt.signAsync(payload, {
+        expiresIn: '7d',
+        secret: refreshSecret,
+      }),
+    ]);
+
+    await this.updateRefreshToken(userId, refreshToken);
 
     return {
-      access_token: token,
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await argon.hash(refreshToken);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken: hashedRefreshToken,
+      },
+    });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const refreshTokenMatches = await argon.verify(
+      user.refreshToken,
+      refreshToken,
+    );
+
+    if (!refreshTokenMatches) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    return this.signToken(user.id, user.email, user.role);
+  }
+
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
   }
 }

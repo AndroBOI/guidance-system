@@ -1,7 +1,9 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthDto } from './dto';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { RefreshTokenGuard } from './refresh-token.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
