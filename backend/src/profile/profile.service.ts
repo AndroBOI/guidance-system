@@ -9,7 +9,11 @@ export class ProfileService {
   async createProfile(createProfileDto: CreateProfileDto, userId: string) {
     const userProfile = await this.prisma.profile.create({
       data: {
-        name: createProfileDto.name,
+        lastName: createProfileDto.lastName,
+        firstName: createProfileDto.firstName,
+        middleName: createProfileDto.middleName,
+        address: createProfileDto.address,
+        phoneNumber: createProfileDto.phoneNumber,
         birthDate: new Date(createProfileDto.birthDate),
         gender: createProfileDto.gender,
         userId,

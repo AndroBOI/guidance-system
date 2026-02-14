@@ -18,7 +18,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>; // ✅ Added
+  login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
 }
 
@@ -30,48 +30,63 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      console.log("📡 Fetching user...");
+      console.log("Fetching user...");
       const res = await api.get<User>("/users/me");
-      console.log("✅ User fetched:", res.data);
+      console.log("User fetched:", res.data);
       setUser(res.data);
+      return res.data;
     } catch (error) {
-      console.log("❌ Failed to fetch user");
+      console.log("Failed to fetch user");
       setUser(null);
+      throw new Error("Failed to fetch user");
     }
   };
 
+  // AuthProvider.tsx
   useEffect(() => {
     let isMounted = true;
 
     const loadUser = async () => {
-      await fetchUser();
-      if (isMounted) {
-        console.log("🏁 Initial load complete");
-        setLoading(false);
+      try {
+        console.log("Loading user...");
+        const userData = await fetchUser(); // fetchUser waits for axios retry
+        if (!userData && document.cookie.includes("refresh_token")) {
+          // If fetchUser still failed but we have refresh token, retry manually
+          console.log("Retrying fetch after refresh token exists...");
+          await api.post("/auth/refresh"); // ensure access token
+          const retriedUser = await fetchUser();
+          if (isMounted) setUser(retriedUser);
+        }
+      } catch (err) {
+        console.log("User load failed:", err);
+        setUser(null);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
     loadUser();
-
     return () => {
       isMounted = false;
     };
   }, []);
 
   const login = async (email: string, password: string) => {
-    console.log("🔐 Logging in...");
+    console.log("Logging in...");
     await api.post("/auth/signin", { email, password });
-    console.log("✅ Login successful, fetching user...");
-    await fetchUser();
-    console.log("✅ User loaded");
+    console.log("Login successful, fetching user...");
+    const userData = await fetchUser();
+    console.log("User loaded");
+
+    return userData;
   };
 
   const logout = async () => {
-    console.log("🚪 Logging out...");
+    console.log("Logging out...");
     try {
       await api.post("/auth/logout");
     } catch (error) {
-      console.log("⚠️ Logout failed but clearing user anyway");
+      console.log("Logout failed but clearing user anyway");
     }
     setUser(null);
     window.location.href = "/login";

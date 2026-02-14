@@ -47,14 +47,18 @@ model User {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  name      String
-  birthDate DateTime
-  gender    Gender
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  lastName    String   @db.VarChar(60)
+  firstName   String   @db.VarChar(60)
+  middleName  String?  @db.VarChar(60)
+  birthDate   DateTime
+  gender      Gender
+  address     String?  @db.VarChar(200)
+  phoneNumber String?  @db.VarChar(20)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Appointment {

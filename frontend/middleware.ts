@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 interface JwtPayload {
@@ -12,25 +12,51 @@ interface JwtPayload {
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  console.log("🔍 Middleware checking path:", path);
+  console.log("Middleware checking path:", path);
 
   const token = req.cookies.get("access_token")?.value;
   const refreshToken = req.cookies.get("refresh_token")?.value;
 
-  console.log("🍪 Access token exists:", !!token);
-  console.log("🍪 Refresh token exists:", !!refreshToken);
+  console.log("Access token exists:", !!token);
+  console.log("Refresh token exists:", !!refreshToken);
 
-  // If no tokens at all, redirect to login
+  if (path === "/login" || path === "/register") {
+    if (refreshToken) {
+      console.log("has refresh token, redirecting away from auth pages");
+
+      if (token) {
+        try {
+          const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+          const { payload } = await jwtVerify(token, secret);
+          const jwtPayload = payload as unknown as JwtPayload;
+
+          const redirectPath =
+            jwtPayload.role === "ADMIN" ? "/admin/dashboard" : "/dashboard";
+          console.log(`🔄 Redirecting ${jwtPayload.role} to ${redirectPath}`);
+          return NextResponse.redirect(new URL(redirectPath, req.url));
+        } catch {
+          console.log(
+            "Token expired but has refresh, redirecting to /dashboard",
+          );
+          return NextResponse.redirect(new URL("/dashboard", req.url));
+        }
+      } else {
+        console.log("🔄 Has refresh token, redirecting to /dashboard");
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+    console.log("No tokens, allowing access to auth pages");
+    return NextResponse.next();
+  }
+
   if (!token && !refreshToken) {
-    console.log("❌ No tokens found, redirecting to /login");
+    console.log("No tokens found, redirecting to /login");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // If no access token but has refresh token, let it through
-  // The client-side axios interceptor will handle the refresh
   if (!token && refreshToken) {
     console.log(
-      "⏭️ No access token but has refresh token, letting through for client refresh",
+      "No access token but has refresh token, letting through for client refresh",
     );
     return NextResponse.next();
   }
@@ -40,11 +66,10 @@ export async function middleware(req: NextRequest) {
     const { payload } = await jwtVerify(token!, secret);
     const jwtPayload = payload as unknown as JwtPayload;
 
-    console.log("✅ Token valid, role:", jwtPayload.role);
+    console.log("Token valid, role:", jwtPayload.role);
 
-    // Role-based access control
     if (path.startsWith("/admin") && jwtPayload.role !== "ADMIN") {
-      console.log("🚫 Not admin, blocking access to admin route");
+      console.log("Not admin, blocking access to admin route");
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
@@ -52,28 +77,33 @@ export async function middleware(req: NextRequest) {
       (path.startsWith("/profile") || path.startsWith("/dashboard")) &&
       jwtPayload.role !== "USER"
     ) {
-      console.log("🚫 Admin trying to access user route, blocking");
+      console.log("Admin trying to access user route, blocking");
       return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
-    console.log("✨ Access granted");
+    console.log("Access granted");
     return NextResponse.next();
   } catch (err) {
     const error = err as { code?: string };
-    console.error("💥 JWT verification failed:", error.code);
+    console.error("JWT verification failed:", error.code);
 
-    // ✅ If token is EXPIRED, let it through for client-side refresh
     if (error.code === "ERR_JWT_EXPIRED") {
-      console.log("🔄 Token expired, letting through for client-side refresh");
+      console.log("Token expired, letting through for client-side refresh");
       return NextResponse.next();
     }
 
-    // ❌ For other errors (invalid signature, malformed, etc.), redirect to login
-    console.log("❌ Invalid token, redirecting to login");
+    console.log("Invalid token, redirecting to login");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/dashboard/:path*", "/admin/:path*"],
+  matcher: [
+    "/",
+    "/profile/:path*",
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/login",
+    "/register",
+  ],
 };

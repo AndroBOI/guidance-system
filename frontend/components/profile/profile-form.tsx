@@ -85,7 +85,7 @@ export const ProfileForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center px-5">
+    <div className="flex h-screen justify-center items-center px-5">
       <Card className="w-full max-w-sm px-5 py-6">
         <CardHeader className="text-center">
           <CardTitle>We lowkey genuinely need your Info Twin</CardTitle>{" "}
@@ -104,12 +104,91 @@ export const ProfileForm = () => {
 
             <FormField
               control={form.control}
-              name="name"
+              name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Last Name</FormLabel>
                   <FormControl>
                     <Input
+                      className="bg-white border-2 border-gray-200"
+                      {...field}
+                      placeholder="John Doe"
+                      type="text"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-white border-2 border-gray-200"
+                      {...field}
+                      placeholder="John Doe"
+                      type="text"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Middle Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-white border-2 border-gray-200"
+                      {...field}
+                      placeholder="John Doe"
+                      type="text"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-white border-2 border-gray-200"
+                      {...field}
+                      placeholder=""
+                      type="text"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-white border-2 border-gray-200"
                       {...field}
                       placeholder="John Doe"
                       type="text"

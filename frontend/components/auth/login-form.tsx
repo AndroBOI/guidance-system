@@ -17,13 +17,11 @@ import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
 
 export const LoginForm = () => {
-  const router = useRouter();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,28 +29,31 @@ export const LoginForm = () => {
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: "", password: "" },
   });
-
   const handleLogin = async (data: LoginFormValues) => {
     setIsLoading(true);
 
     try {
-      console.log("📝 Submitting login form...");
-      await login(data.email, data.password);
-      console.log("✅ Login complete, redirecting...");
-      router.push("/dashboard");
+      console.log("Submitting login form...");
+      const loggedInUser = await login(data.email, data.password);
+      console.log("Login complete, user:", loggedInUser);
+
+      if (loggedInUser) {
+        console.log("🔄 User loaded, redirecting...");
+        window.location.href = "/dashboard";
+      } else {
+        throw new Error("Login succeeded but user not loaded");
+      }
     } catch (error) {
-      console.error("❌ Login failed:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Invalid email or password";
+      console.error("Login failed:", error);
       form.setError("root", {
         type: "manual",
-        message: errorMessage || "Invalid email or password",
+        message:
+          error instanceof Error ? error.message : "Invalid email or password",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex min-h-screen justify-center items-center px-5">
       <CardWrapper
