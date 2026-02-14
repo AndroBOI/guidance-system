@@ -70,15 +70,26 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       isMounted = false;
     };
   }, []);
-
   const login = async (email: string, password: string) => {
-    console.log("Logging in...");
-    await api.post("/auth/signin", { email, password });
-    console.log("Login successful, fetching user...");
-    const userData = await fetchUser();
-    console.log("User loaded");
+    try {
+      const loginRes = await api.post("/auth/signin", { email, password });
+      const userData = await fetchUser();
 
-    return userData;
+      if (!userData) {
+        throw new Error("Login succeeded but failed to fetch user data");
+      }
+      return userData;
+    } catch (error: any) {
+      console.error("Login error:", error);
+      if (error.response?.status === 403) {
+        throw new Error(error.response?.data?.message || "Invalid credentials");
+      }
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+
+      throw new Error("Login failed. Please try again.");
+    }
   };
 
   const logout = async () => {

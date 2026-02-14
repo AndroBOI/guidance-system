@@ -48,7 +48,6 @@ const RegisterForm = () => {
 
       const result = await response.json();
       setUser(result);
-      alert("Registration successful!");
       router.push("/login");
       console.log("Registration successful", result);
       form.reset();

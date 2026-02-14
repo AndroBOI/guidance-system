@@ -44,7 +44,7 @@ model User {
   appointments         Appointment[]
   profile              Profile?
   approvedAppointments Appointment[] @relation("AdminApproved")
-}
+} 
 
 model Profile {
   id          String   @id @default(cuid())

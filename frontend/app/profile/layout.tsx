@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-siderbar";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,20 +15,16 @@ export default function ProfileLayout({ children }: LayoutProps) {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
 
- 
   if (!loading && !user) {
     router.push("/login");
     return null;
   }
-
-  if (loading) {
+  if (loading)
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="text-xl">Loading...</div>
+      <div className="h-screen flex justify-center items-center">
+        <Spinner className="size-20 text-primary" />
       </div>
     );
-  }
-
 
   if (!user) {
     return null;
@@ -33,17 +32,13 @@ export default function ProfileLayout({ children }: LayoutProps) {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <nav className="w-full bg-primary p-4 text-white flex justify-between items-center">
-        <span>Profile - {user.email}</span>
-        <Button variant="destructive"
-          onClick={logout}
-          className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </Button>
-      </nav>
-
-      <main className="flex-1 p-4 overflow-auto">{children}</main>
+      <SidebarProvider>
+        <AppSidebar/>
+        <main className="flex-1 p-4 overflow-auto">
+          <SidebarTrigger />
+          {children}
+        </main>
+      </SidebarProvider>
     </div>
   );
 }

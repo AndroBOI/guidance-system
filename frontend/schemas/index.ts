@@ -10,18 +10,52 @@ export const LoginSchema = z.object({
 export const RegisterSchema = z.object({
   email: z.email(),
   password: z.string().min(6, {
-    message: "Mininum password length is 6 characters",
+    message: "Minimum password length is 6 characters",
   }),
 });
 
 export const ProfileSchema = z.object({
-  name: z
+  firstName: z
     .string()
     .min(1, {
-      message: "Name is required",
+      message: "First name is required",
     })
     .max(64, {
       message: "Maximum name length is 64 characters",
+    }),
+
+  lastName: z
+    .string()
+    .min(1, {
+      message: "Last name is required",
+    })
+    .max(64, {
+      message: "Maximum name length is 64 characters",
+    }),
+
+  middleName: z
+    .string()
+    .max(64, {
+      message: "Maximum name length is 64 characters",
+    })
+    .optional(),
+
+  phoneNumber: z
+    .string()
+    .min(10, {
+      message: "Please provide a valid phone number",
+    })
+    .max(15, {
+      message: "Phone number is too long",
+    }),
+
+  address: z
+    .string()
+    .min(1, {
+      message: "Address is required",
+    })
+    .max(200, {
+      message: "Maximum address length is 200 characters",
     }),
 
   birthDate: z
