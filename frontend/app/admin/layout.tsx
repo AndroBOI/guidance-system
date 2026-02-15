@@ -5,24 +5,22 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-siderbar";
+import { AdminSidebar } from "@/components/admin-sidebar";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-export default function ProfileLayout({ children }: LayoutProps) {
+export default function AdminLayout({ children }: LayoutProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
-  
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -30,7 +28,6 @@ export default function ProfileLayout({ children }: LayoutProps) {
       </div>
     );
   }
-
 
   if (!user) {
     return (
@@ -43,7 +40,7 @@ export default function ProfileLayout({ children }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <SidebarProvider>
-        <AppSidebar />
+        <AdminSidebar />
         <main className="flex-1 p-4 overflow-auto">
           <SidebarTrigger />
           {children}

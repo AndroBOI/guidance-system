@@ -61,9 +61,10 @@ export class ProfileController {
     };
   }
 
-  @Get('check/:userId')
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
   async checkProfile(@Req() req: RequestWithUser) {
-    const hasProfile = await this.profileService.checkProfile(req.user.sub);
+    const hasProfile = await this.profileService.getProfile(req.user.sub);
     return { hasProfile };
   }
 }

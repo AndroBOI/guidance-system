@@ -57,4 +57,19 @@ export class ProfileService {
 
     return !!profile;
   }
+
+  async getProfile(userId: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+
+    return profile;
+  }
 }

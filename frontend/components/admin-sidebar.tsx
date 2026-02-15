@@ -12,39 +12,58 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
-  User,
-  History,
-  CalendarPlus,
+  Users,
+  UserCog,
+  Calendar,
+  FileText,
+  Settings,
+  BarChart3,
+  Shield,
   LogOut,
   GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-export function AppSidebar() {
+export function AdminSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
   const navItems = [
     {
       name: "Dashboard",
-      href: "/profile/dashboard",
+      href: "/admin/dashboard",
       icon: LayoutDashboard,
     },
     {
-      name: "Profile",
-      href: "/profile",
-      icon: User,
+      name: "Students",
+      href: "/admin/students",
+      icon: Users,
     },
     {
-      name: "History",
-      href: "/profile/history",
-      icon: History,
+      name: "Counselors",
+      href: "/admin/counselors",
+      icon: UserCog,
     },
     {
       name: "Appointments",
-      href: "/profile/appointment/create",
-      icon: CalendarPlus,
+      href: "/admin/appointments",
+      icon: Calendar,
+    },
+    {
+      name: "Reports",
+      href: "/admin/reports",
+      icon: FileText,
+    },
+    {
+      name: "Analytics",
+      href: "/admin/analytics",
+      icon: BarChart3,
+    },
+    {
+      name: "Settings",
+      href: "/admin/settings",
+      icon: Settings,
     },
   ];
 
@@ -53,11 +72,11 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2 p-4">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
-            <GraduationCap className="h-6 w-6 text-primary-foreground" />
+            <Shield className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
             <p className="font-semibold text-lg">Guidance System</p>
-            <p className="text-xs text-muted-foreground">Student Portal</p>
+            <p className="text-xs text-muted-foreground">Admin Portal</p>
           </div>
         </div>
       </SidebarHeader>
@@ -94,15 +113,16 @@ export function AppSidebar() {
         <div className="p-3 space-y-3">
           <Separator />
 
-          {/* User Info */}
-          <div className="px-3 py-2">
+        
+          <div className="px-3 py-2 bg-primary/5 rounded-lg border border-primary/10">
+            <div className="flex items-center gap-2 mb-1">
+              <Shield className="h-4 w-4 text-primary" />
+              <p className="text-xs font-semibold text-primary">ADMIN</p>
+            </div>
             <p className="text-sm font-medium truncate">{user?.email}</p>
-            <p className="text-xs text-muted-foreground capitalize">
-              {user?.role.toLowerCase()}
-            </p>
           </div>
 
-          {/* Logout Button */}
+
           <Button
             variant="ghost"
             className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -112,7 +132,7 @@ export function AppSidebar() {
             Logout
           </Button>
 
-          {/* Copyright */}
+
           <div className="px-3 pt-2 border-t">
             <p className="text-xs text-muted-foreground text-center">
               © 2026 Guidance System

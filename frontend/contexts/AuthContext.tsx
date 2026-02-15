@@ -12,7 +12,7 @@ import api from "@/lib/api";
 interface User {
   sub: string;
   email: string;
-  role: string;
+  role: "ADMIN" | "USER";
   hasProfile?: boolean;
 }
 
@@ -31,13 +31,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async (): Promise<User | null> => {
     try {
-      console.log("[AuthContext] Fetching user...");
       const res = await api.get<User>("/users/me");
-      console.log("[AuthContext] User fetched:", res.data);
       setUser(res.data);
       return res.data;
     } catch (error) {
-      console.log("[AuthContext] Failed to fetch user:", error);
+      console.log("[AuthContext] Failed to fetch user");
       setUser(null);
       return null;
     }
@@ -48,13 +46,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const loadUser = async () => {
       try {
-        console.log("[AuthContext] Initial load - fetching user...");
         await fetchUser();
       } catch {
-        console.log("[AuthContext] Initial fetch failed (user not logged in)");
+
       } finally {
         if (isMounted) {
-          console.log("[AuthContext] Setting loading to false");
           setLoading(false);
         }
       }
@@ -107,7 +103,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    console.log("[AuthContext] Logging out...");
     try {
       await api.post("/auth/logout");
     } catch {

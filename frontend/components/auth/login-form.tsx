@@ -29,6 +29,7 @@ export const LoginForm = () => {
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: "", password: "" },
   });
+
   const handleLogin = async (data: LoginFormValues) => {
     setIsLoading(true);
 
@@ -38,8 +39,15 @@ export const LoginForm = () => {
       console.log("Login complete, user:", loggedInUser);
 
       if (loggedInUser) {
-        console.log("🔄 User loaded, redirecting...");
-        window.location.href = "/create/info";
+        console.log("🔄 User loaded, redirecting based on role...");
+
+        if (loggedInUser.role === "ADMIN") {
+          window.location.href = "/admin/dashboard";
+        } else if (!loggedInUser.hasProfile) {
+          window.location.href = "/create/info";
+        } else {
+          window.location.href = "/profile/dashboard";
+        }
       } else {
         throw new Error("Login succeeded but user not loaded");
       }
@@ -54,6 +62,7 @@ export const LoginForm = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="flex min-h-screen justify-center items-center px-5">
       <CardWrapper
@@ -69,8 +78,8 @@ export const LoginForm = () => {
             onSubmit={form.handleSubmit(handleLogin)}
           >
             {form.formState.errors.root && (
-              <div className="flex justify-center items-center gap-x-3  text-red-600 px-4 py-3 rounded bg-red-200 ">
-                <Info className="text-red" size={20} />
+              <div className="flex justify-center items-center gap-x-3 text-red-600 px-4 py-3 rounded bg-red-50 border border-red-200">
+                <Info className="text-red-600" size={20} />
                 {form.formState.errors.root.message}
               </div>
             )}
