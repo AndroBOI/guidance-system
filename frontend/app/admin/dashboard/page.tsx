@@ -1,9 +1,7 @@
-import React from 'react'
+import AdminDashboard from "@/components/admin/admin-dashboard";
 
 const page = () => {
-  return (
-    <div className='text-5xl min-h-screen flex justify-center items-center'>This is Admin Only</div>
-  )
-}
+  return <AdminDashboard />;
+};
 
-export default page
+export default page;

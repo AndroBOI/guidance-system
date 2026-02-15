@@ -39,7 +39,7 @@ export const LoginForm = () => {
       console.log("Login complete, user:", loggedInUser);
 
       if (loggedInUser) {
-        console.log("🔄 User loaded, redirecting based on role...");
+        console.log("User loaded, redirecting based on role...");
 
         if (loggedInUser.role === "ADMIN") {
           window.location.href = "/admin/dashboard";
