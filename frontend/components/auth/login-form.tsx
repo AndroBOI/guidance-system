@@ -39,7 +39,7 @@ export const LoginForm = () => {
 
       if (loggedInUser) {
         console.log("🔄 User loaded, redirecting...");
-        window.location.href = "/dashboard";
+        window.location.href = "/create/info";
       } else {
         throw new Error("Login succeeded but user not loaded");
       }

@@ -5,5 +5,6 @@ export interface RequestWithUser {
     sub: string;
     email: string;
     role: Role;
+    hasProfile?: boolean;
   };
 }

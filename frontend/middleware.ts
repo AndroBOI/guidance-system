@@ -6,104 +6,114 @@ interface JwtPayload {
   sub: string;
   email: string;
   role: "ADMIN" | "USER";
+  hasProfile?: boolean;
   iat?: number;
   exp?: number;
 }
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  console.log("Middleware checking path:", path);
-
   const token = req.cookies.get("access_token")?.value;
-  const refreshToken = req.cookies.get("refresh_token")?.value;
 
-  console.log("Access token exists:", !!token);
-  console.log("Refresh token exists:", !!refreshToken);
+  console.log("[Middleware] Path:", path, "Has token:", !!token);
 
+  // Public routes - redirect to appropriate dashboard if logged in
   if (path === "/login" || path === "/register") {
-    if (refreshToken) {
-      console.log("has refresh token, redirecting away from auth pages");
+    if (token) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
+        const jwtPayload = payload as unknown as JwtPayload;
 
-      if (token) {
-        try {
-          const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-          const { payload } = await jwtVerify(token, secret);
-          const jwtPayload = payload as unknown as JwtPayload;
-
-          const redirectPath =
-            jwtPayload.role === "ADMIN" ? "/admin/dashboard" : "/dashboard";
-          console.log(`🔄 Redirecting ${jwtPayload.role} to ${redirectPath}`);
-          return NextResponse.redirect(new URL(redirectPath, req.url));
-        } catch {
-          console.log(
-            "Token expired but has refresh, redirecting to /dashboard",
-          );
-          return NextResponse.redirect(new URL("/dashboard", req.url));
+        if (jwtPayload.role === "ADMIN") {
+          return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
-      } else {
-        console.log("🔄 Has refresh token, redirecting to /dashboard");
+
+        if (!jwtPayload.hasProfile) {
+          return NextResponse.redirect(new URL("/create/info", req.url));
+        }
+
         return NextResponse.redirect(new URL("/dashboard", req.url));
+      } catch (error) {
+        console.log("[Middleware] Token verification failed:", error);
+        return NextResponse.next();
       }
     }
-    console.log("No tokens, allowing access to auth pages");
     return NextResponse.next();
   }
 
-  if (!token && !refreshToken) {
-    console.log("No tokens found, redirecting to /login");
+  // Protected routes - require authentication
+  if (!token) {
+    console.log("[Middleware] No token, redirecting to login");
     return NextResponse.redirect(new URL("/login", req.url));
-  }
-
-  if (!token && refreshToken) {
-    console.log(
-      "No access token but has refresh token, letting through for client refresh",
-    );
-    return NextResponse.next();
   }
 
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token!, secret);
+    const { payload } = await jwtVerify(token, secret);
     const jwtPayload = payload as unknown as JwtPayload;
 
-    console.log("Token valid, role:", jwtPayload.role);
+    console.log(
+      "[Middleware] User role:",
+      jwtPayload.role,
+      "Has profile:",
+      jwtPayload.hasProfile,
+    );
 
+    // Admin-only routes
     if (path.startsWith("/admin") && jwtPayload.role !== "ADMIN") {
-      console.log("Not admin, blocking access to admin route");
+      console.log("[Middleware] Non-admin trying to access admin route");
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
+    // Admin trying to access user routes
     if (
-      (path.startsWith("/profile") || path.startsWith("/dashboard")) &&
-      jwtPayload.role !== "USER"
+      (path.startsWith("/profile") ||
+        path.startsWith("/dashboard") ||
+        path === "/create/info") &&
+      jwtPayload.role === "ADMIN"
     ) {
-      console.log("Admin trying to access user route, blocking");
+      console.log("[Middleware] Admin trying to access user route");
       return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
-    console.log("Access granted");
-    return NextResponse.next();
-  } catch (err) {
-    const error = err as { code?: string };
-    console.error("JWT verification failed:", error.code);
+    // User-specific route protection
+    if (jwtPayload.role === "USER") {
+      // If trying to access /create/info but already has profile
+      if (path === "/create/info" && jwtPayload.hasProfile) {
+        console.log(
+          "[Middleware] User with profile trying to access create/info",
+        );
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
 
-    if (error.code === "ERR_JWT_EXPIRED") {
-      console.log("Token expired, letting through for client-side refresh");
-      return NextResponse.next();
+      // If trying to access /profile without profile (but allow /dashboard and /create/info)
+      if (path.startsWith("/profile") && !jwtPayload.hasProfile) {
+        console.log(
+          "[Middleware] User without profile trying to access profile",
+        );
+        return NextResponse.redirect(new URL("/create/info", req.url));
+      }
+
+      // REMOVED: No longer block /dashboard for users without profile
+      // Users can access dashboard regardless of profile status
     }
 
-    console.log("Invalid token, redirecting to login");
+    console.log("[Middleware] Allowing access to:", path);
+    return NextResponse.next();
+  } catch (error) {
+    console.log("[Middleware] Token verification error:", error);
     return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 
 export const config = {
   matcher: [
-    "/",
     "/profile/:path*",
     "/dashboard/:path*",
     "/admin/:path*",
     "/login",
     "/register",
+    "/create/info",
   ],
 };

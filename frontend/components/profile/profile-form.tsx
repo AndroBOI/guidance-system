@@ -33,7 +33,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils"; // Standard shadcn utility
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 type ProfileFormValues = z.infer<typeof ProfileSchema>;
@@ -56,7 +56,6 @@ export const ProfileForm = () => {
     },
   });
 
-  // Function to validate current step before proceeding
   const nextStep = async () => {
     const fields =
       step === 1
@@ -116,7 +115,6 @@ export const ProfileForm = () => {
               </div>
             )}
 
-            {/* STEP 1: Personal Details */}
             {step === 1 && (
               <div className="space-y-4">
                 <FormField
@@ -126,7 +124,11 @@ export const ProfileForm = () => {
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isLoading} />
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          className="border-gray-300"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -139,7 +141,11 @@ export const ProfileForm = () => {
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isLoading} />
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          className="border-gray-300"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -152,7 +158,11 @@ export const ProfileForm = () => {
                     <FormItem>
                       <FormLabel>Middle Name</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isLoading} />
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          className="border-gray-300"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -166,6 +176,7 @@ export const ProfileForm = () => {
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <Input
+                          className="border-gray-300 placeholder:text-gray-400"
                           placeholder="09123456789"
                           {...field}
                           disabled={isLoading}
@@ -178,7 +189,6 @@ export const ProfileForm = () => {
               </div>
             )}
 
-            {/* STEP 2: Additional Info */}
             {step === 2 && (
               <div className="space-y-4">
                 <FormField
@@ -227,6 +237,9 @@ export const ProfileForm = () => {
                             disabled={(date) =>
                               date > new Date() || date < new Date("1900-01-01")
                             }
+                            captionLayout="dropdown"
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
                             initialFocus
                           />
                         </PopoverContent>
@@ -263,7 +276,6 @@ export const ProfileForm = () => {
               </div>
             )}
 
-            {/* NAVIGATION BUTTONS */}
             <div className="flex gap-2 pt-2">
               {step > 1 && (
                 <Button

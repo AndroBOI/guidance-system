@@ -13,6 +13,7 @@ interface User {
   sub: string;
   email: string;
   role: string;
+  hasProfile?: boolean;
 }
 
 interface AuthContextType {
@@ -28,64 +29,78 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const fetchUser = async (): Promise<User | null> => {
     try {
-      console.log("Fetching user...");
+      console.log("[AuthContext] Fetching user...");
       const res = await api.get<User>("/users/me");
-      console.log("User fetched:", res.data);
+      console.log("[AuthContext] User fetched:", res.data);
       setUser(res.data);
       return res.data;
     } catch (error) {
-      console.log("Failed to fetch user");
+      console.log("[AuthContext] Failed to fetch user:", error);
       setUser(null);
-      throw new Error("Failed to fetch user");
+      return null;
     }
   };
 
-  // AuthProvider.tsx
   useEffect(() => {
     let isMounted = true;
 
     const loadUser = async () => {
       try {
-        console.log("Loading user...");
-        const userData = await fetchUser(); // fetchUser waits for axios retry
-        if (!userData && document.cookie.includes("refresh_token")) {
-          // If fetchUser still failed but we have refresh token, retry manually
-          console.log("Retrying fetch after refresh token exists...");
-          await api.post("/auth/refresh"); // ensure access token
-          const retriedUser = await fetchUser();
-          if (isMounted) setUser(retriedUser);
-        }
-      } catch (err) {
-        console.log("User load failed:", err);
-        setUser(null);
+        console.log("[AuthContext] Initial load - fetching user...");
+        await fetchUser();
+      } catch {
+        console.log("[AuthContext] Initial fetch failed (user not logged in)");
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          console.log("[AuthContext] Setting loading to false");
+          setLoading(false);
+        }
       }
     };
 
     loadUser();
+
     return () => {
       isMounted = false;
     };
   }, []);
-  const login = async (email: string, password: string) => {
+
+  const login = async (email: string, password: string): Promise<User> => {
     try {
-      const loginRes = await api.post("/auth/signin", { email, password });
-      const userData = await fetchUser();
+      console.log("[AuthContext] Logging in...");
+      const response = await api.post("/auth/signin", { email, password });
+
+      console.log("[AuthContext] Login response:", response.data);
+
+      // Get user data directly from signin response
+      const userData = response.data.user;
 
       if (!userData) {
-        throw new Error("Login succeeded but failed to fetch user data");
+        throw new Error("No user data in signin response");
       }
+
+      console.log("[AuthContext] User data received:", userData);
+      setUser(userData);
+
       return userData;
-    } catch (error: any) {
-      console.error("Login error:", error);
-      if (error.response?.status === 403) {
-        throw new Error(error.response?.data?.message || "Invalid credentials");
-      }
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
+    } catch (error) {
+      console.error("[AuthContext] Login error:", error);
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { status?: number; data?: { message?: string } };
+        };
+
+        if (axiosError.response?.status === 403) {
+          throw new Error(
+            axiosError.response?.data?.message || "Invalid credentials",
+          );
+        }
+        if (axiosError.response?.data?.message) {
+          throw new Error(axiosError.response.data.message);
+        }
       }
 
       throw new Error("Login failed. Please try again.");
@@ -93,11 +108,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    console.log("Logging out...");
+    console.log("[AuthContext] Logging out...");
     try {
       await api.post("/auth/logout");
-    } catch (error) {
-      console.log("Logout failed but clearing user anyway");
+    } catch {
+      console.log("[AuthContext] Logout failed but clearing user anyway");
     }
     setUser(null);
     window.location.href = "/login";

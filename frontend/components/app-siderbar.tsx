@@ -17,6 +17,7 @@ export function AppSidebar() {
     { name: "Dashboard", href: "/profile/dashboard" },
     { name: "Profile", href: "/profile/create" },
     { name: "History", href: "/profile/history" },
+      { name: "Appointments", href: "/profile/appointment/create" },
   ];
 
   return (

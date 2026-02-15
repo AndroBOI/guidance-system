@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  Res,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateProfileDto } from './dto/create-profile.dto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { ProfileGuard } from './profile.guard';
 
 interface RequestWithUser extends Request {
@@ -21,16 +29,41 @@ export class ProfileController {
   async createProfile(
     @Req() req: RequestWithUser,
     @Body() createProfileDto: CreateProfileDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.profileService.createProfile(
+    const result = await this.profileService.createProfile(
       createProfileDto,
       req.user.sub,
+      req.user.email,
+      req.user.role as 'ADMIN' | 'USER',
     );
+
+    res.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 60 * 1000,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return {
+      message: 'Profile created sucessfully',
+      profile: result.profile,
+    };
   }
 
   @UseGuards(AuthGuard('jwt'), ProfileGuard)
   @Get('dashboard')
-  getDashboard() {
-    return { message: 'Welcome to your profile dashboard!' };
+  getDashboard(@Req() req: RequestWithUser) {
+    return {
+      message: 'Welcome to your profile dashboard!',
+      user: req.user,
+    };
+  }
+
+  @Get('check/:userId')
+  async checkProfile(@Req() req: RequestWithUser) {
+    const hasProfile = await this.profileService.checkProfile(req.user.sub);
+    return { hasProfile };
   }
 }
