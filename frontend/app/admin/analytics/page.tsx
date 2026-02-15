@@ -95,9 +95,6 @@ const AnalyticsPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              System overview and key metrics
-            </p>
           </div>
         </div>
 

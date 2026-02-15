@@ -40,7 +40,7 @@ export class AuthController {
 
     return {
       message: 'Signed up successfully',
-      user: result.user, // Return user data
+      user: result.user, 
     };
   }
 
@@ -62,7 +62,7 @@ export class AuthController {
 
     return {
       message: 'Signed in successfully',
-      user: result.user, // Return user data
+      user: result.user, 
     };
   }
 

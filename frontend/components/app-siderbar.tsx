@@ -94,11 +94,11 @@ export function AppSidebar() {
         <div className="p-3 space-y-3">
           <Separator />
 
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 bg-primary/5 rounded-lg border border-primary/10">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-xs font-semibold text-primary">User</p>
+            </div>
             <p className="text-sm font-medium truncate">{user?.email}</p>
-            <p className="text-xs text-muted-foreground capitalize">
-              {user?.role.toLowerCase()}
-            </p>
           </div>
 
           <Button

@@ -77,33 +77,6 @@ export default function Dashboard() {
 
     
 
-        <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary rounded-lg">
-                <User className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">
-                  Welcome to your dashboard!
-                </h3>
-                <p className="text-muted-foreground mt-1">
-                  {user.hasProfile
-                    ? "Your profile is complete. Explore the quick actions above to get started."
-                    : "Complete your profile to unlock all features."}
-                </p>
-                {!user.hasProfile && (
-                  <Button
-                    className="mt-3"
-                    onClick={() => router.push("/create/info")}
-                  >
-                    Complete Profile
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

@@ -89,7 +89,7 @@ export default function ProfilePage() {
           <CardContent className="pt-6">
             <p className="text-red-600 text-center">{error}</p>
             <Button
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/profile/dashboard")}
               className="w-full mt-4"
             >
               Back to Dashboard
@@ -199,16 +199,6 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex gap-4">
-          <Button
-            variant="outline"
-            onClick={() => router.push("/dashboard")}
-            className="flex-1"
-          >
-            Back to Dashboard
-          </Button>
-        </div>
       </div>
     </div>
   );

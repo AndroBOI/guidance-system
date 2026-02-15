@@ -103,9 +103,6 @@ export const ProfileForm = () => {
         <h1 className="text-3xl md:text-4xl font-bold">
           Complete Your Profile
         </h1>
-        <p className="text-muted-foreground max-w-md">
-          Help us personalize your experience by completing your profile
-        </p>
       </div>
 
       <Card className="w-full max-w-lg shadow-lg">

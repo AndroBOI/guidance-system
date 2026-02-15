@@ -20,7 +20,7 @@ import {
 const chartConfig = {
   total: {
     label: "Appointments",
-    color: "#8884d8", // Changed to direct color
+    color: "#8884d8", 
   },
 } satisfies ChartConfig;
 
@@ -34,7 +34,6 @@ interface ChartLineDotsProps {
 }
 
 export function ChartLineDots({ data }: ChartLineDotsProps) {
-  // Find the peak month
   const peakMonth = data.reduce(
     (max, current) => (current.total > max.total ? current : max),
     data[0],
@@ -47,9 +46,6 @@ export function ChartLineDots({ data }: ChartLineDotsProps) {
     <Card>
       <CardHeader>
         <CardTitle>Monthly Appointments Trend</CardTitle>
-        <CardDescription>
-          Total appointments per month - Last 6 months
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
