@@ -4,6 +4,8 @@ import {
   IsEnum,
   IsNotEmpty,
   Matches,
+  IsOptional,
+  ValidateIf,
 } from 'class-validator';
 import { Gender } from 'generated/prisma/enums';
 
@@ -11,23 +13,29 @@ export class CreateProfileDto {
   @IsString()
   @IsNotEmpty()
   @Matches(/^[A-Za-zÀ-ÖØ-öø-ÿ'-]+(?: [A-Za-zÀ-ÖØ-öø-ÿ'-]+)*$/, {
-    message: 'Name can only contain letters, spaces, hyphens, and apostrophes',
+    message:
+      'Last name can only contain letters, spaces, hyphens, and apostrophes',
   })
   lastName: string;
 
   @IsString()
   @IsNotEmpty()
   @Matches(/^[A-Za-zÀ-ÖØ-öø-ÿ'-]+(?: [A-Za-zÀ-ÖØ-öø-ÿ'-]+)*$/, {
-    message: 'Name can only contain letters, spaces, hyphens, and apostrophes',
+    message:
+      'First name can only contain letters, spaces, hyphens, and apostrophes',
   })
   firstName: string;
 
+  @IsOptional()
+  @ValidateIf(
+    (o: CreateProfileDto) => o.middleName !== '' && o.middleName !== null,
+  )
   @IsString()
-  @IsNotEmpty()
   @Matches(/^[A-Za-zÀ-ÖØ-öø-ÿ'-]+(?: [A-Za-zÀ-ÖØ-öø-ÿ'-]+)*$/, {
-    message: 'Name can only contain letters, spaces, hyphens, and apostrophes',
+    message:
+      'Middle name can only contain letters, spaces, hyphens, and apostrophes',
   })
-  middleName: string;
+  middleName?: string;
 
   @IsString()
   @IsNotEmpty()

@@ -74,7 +74,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       console.log("[AuthContext] Login response:", response.data);
 
-      // Get user data directly from signin response
       const userData = response.data.user;
 
       if (!userData) {

@@ -97,7 +97,8 @@ export const ProfileForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center px-5">
+    <div className="flex flex-col gap-y-10 min-h-screen justify-center items-center px-5">
+      <div className="text-4xl font-bold">Please Build your profile first to continue</div>
       <Card className="w-full max-w-md px-4 py-6">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Step {step} of 2</CardTitle>
