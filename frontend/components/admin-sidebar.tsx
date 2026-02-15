@@ -13,14 +13,10 @@ import {
 import {
   LayoutDashboard,
   Users,
-  UserCog,
   Calendar,
-  FileText,
-  Settings,
   BarChart3,
   Shield,
   LogOut,
-  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -36,34 +32,21 @@ export function AdminSidebar() {
       icon: LayoutDashboard,
     },
     {
-      name: "Students",
+      name: "Users",
       href: "/admin/students",
       icon: Users,
     },
-    {
-      name: "Counselors",
-      href: "/admin/counselors",
-      icon: UserCog,
-    },
+
     {
       name: "Appointments",
       href: "/admin/appointments",
       icon: Calendar,
     },
-    {
-      name: "Reports",
-      href: "/admin/reports",
-      icon: FileText,
-    },
+
     {
       name: "Analytics",
       href: "/admin/analytics",
       icon: BarChart3,
-    },
-    {
-      name: "Settings",
-      href: "/admin/settings",
-      icon: Settings,
     },
   ];
 
@@ -113,7 +96,6 @@ export function AdminSidebar() {
         <div className="p-3 space-y-3">
           <Separator />
 
-        
           <div className="px-3 py-2 bg-primary/5 rounded-lg border border-primary/10">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-primary" />
@@ -121,7 +103,6 @@ export function AdminSidebar() {
             </div>
             <p className="text-sm font-medium truncate">{user?.email}</p>
           </div>
-
 
           <Button
             variant="ghost"
@@ -132,10 +113,9 @@ export function AdminSidebar() {
             Logout
           </Button>
 
-
           <div className="px-3 pt-2 border-t">
             <p className="text-xs text-muted-foreground text-center">
-              © 2026 Guidance System
+              © Code by Andrewboi
             </p>
           </div>
         </div>

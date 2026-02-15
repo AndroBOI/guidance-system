@@ -2,11 +2,9 @@
 
 import { TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -18,66 +16,62 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-export const description = "A pie chart showing appointment concerns";
-
-const chartData = [
-  { concern: "ACADEMIC", count: 45, fill: "var(--color-academic)" },
-  { concern: "PERSONAL", count: 30, fill: "var(--color-personal)" },
-  { concern: "HEALTH", count: 15, fill: "var(--color-health)" },
-  { concern: "CAREER", count: 8, fill: "var(--color-career)" },
-  { concern: "OTHER", count: 2, fill: "var(--color-other)" },
-];
-
 const chartConfig = {
   count: {
     label: "Appointments",
   },
-  ACADEMIC: {
-    label: "Academic",
-    color: "var(--chart-1)",
-  },
-  PERSONAL: {
-    label: "Personal",
-    color: "var(--chart-2)",
-  },
-  HEALTH: {
-    label: "Health",
-    color: "var(--chart-3)",
-  },
-  CAREER: {
-    label: "Career",
-    color: "var(--chart-4)",
-  },
-  OTHER: {
-    label: "Other",
-    color: "var(--chart-5)",
-  },
 } satisfies ChartConfig;
 
-export function ChartPieLabel() {
+const concernColors: Record<string, string> = {
+  ACADEMIC: "#4F46E5",
+  PERSONAL: "#F97316",
+  HEALTH: "#10B981",
+  CAREER: "#F59E0B",
+  OTHER: "#6B7280",
+};
+
+interface ChartPieLabelProps {
+  data: Array<{
+    concern: string;
+    count: number;
+  }>;
+}
+
+export function ChartPieLabel({ data }: ChartPieLabelProps) {
+  const chartData = data.map((item) => ({
+    concern: item.concern,
+    count: item.count,
+    fill: concernColors[item.concern] || "#6B7280",
+  }));
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Concern Distribution</CardTitle>
-        <CardDescription>Semester 1 – 2026</CardDescription>
+        <CardTitle>Appointments by Concern</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[250px] pb-0"
+          className="mx-auto aspect-square max-h-[300px]"
         >
           <PieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="count" label nameKey="concern" />
+            <Pie
+              data={chartData}
+              dataKey="count"
+              label
+              nameKey="concern"
+              labelLine={false}
+            />
           </PieChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
-          Trending up by 12% this semester <TrendingUp className="h-4 w-4" />
+          Distribution by concern type <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none">
-          Showing appointment concerns distribution for this semester
+          Total appointments categorized by concern
         </div>
       </CardFooter>
     </Card>

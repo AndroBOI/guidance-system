@@ -96,7 +96,6 @@ export const ProfileForm = () => {
 
   return (
     <div className="flex flex-col gap-y-8 min-h-screen justify-center items-center px-5 bg-gradient-to-br from-background to-muted/20">
- 
       <div className="text-center space-y-3">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2">
           <User className="h-8 w-8 text-primary" />
@@ -109,7 +108,6 @@ export const ProfileForm = () => {
         </p>
       </div>
 
-   
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-xl">
