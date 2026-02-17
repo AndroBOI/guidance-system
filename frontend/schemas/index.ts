@@ -1,5 +1,19 @@
 import * as z from "zod";
 
+export const AppointmentSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(100, "Title must be 100 characters or less"),
+  concern: z.enum(["ACADEMIC", "PERSONAL", "HEALTH", "CAREER", "OTHER"], {
+    message: "Please select a concern",
+  }),
+  description: z
+    .string()
+    .max(500, "Description must be 500 characters or less")
+    .optional(),
+});
+
 export const LoginSchema = z.object({
   email: z.email(),
   password: z.string().min(1, {

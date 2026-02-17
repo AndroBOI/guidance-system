@@ -1,11 +1,7 @@
-import React from 'react'
+import { CalendarBookedDates } from "@/components/user-calendar";
 
 const page = () => {
-  return (
-    <div>
-        Create Appointment
-    </div>
-  )
-}
+  return <CalendarBookedDates />;
+};
 
-export default page
+export default page;

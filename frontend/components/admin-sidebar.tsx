@@ -33,7 +33,7 @@ export function AdminSidebar() {
     },
     {
       name: "Users",
-      href: "/admin/students",
+      href: "/admin/users",
       icon: Users,
     },
 

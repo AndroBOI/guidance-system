@@ -343,7 +343,7 @@ export const ProfileForm = () => {
                     onClick={nextStep}
                     className="flex-1 h-10"
                   >
-                    Continue →
+                    Continue
                   </Button>
                 ) : (
                   <Button

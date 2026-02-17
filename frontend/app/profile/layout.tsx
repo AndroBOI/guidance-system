@@ -43,7 +43,7 @@ export default function ProfileLayout({ children }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar /> 
         <main className="flex-1 p-4 overflow-auto">
           <SidebarTrigger />
           {children}
