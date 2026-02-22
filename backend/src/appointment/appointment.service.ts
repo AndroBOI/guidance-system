@@ -78,7 +78,9 @@ export class AppointmentService {
     return { bookedSlots };
   }
 
-  async getFullyBookedDates(month: string): Promise<{ fullyBookedDates: string[] }> {
+  async getFullyBookedDates(
+    month: string,
+  ): Promise<{ fullyBookedDates: string[] }> {
     const [year, monthNum] = month.split('-').map(Number);
 
     const start = new Date(year, monthNum - 1, 1);
@@ -96,7 +98,7 @@ export class AppointmentService {
     });
     const countByDay: Record<string, number> = {};
     for (const appt of appointments) {
-      const day = appt.date.toISOString().split('T')[0]; 
+      const day = appt.date.toISOString().split('T')[0];
       countByDay[day] = (countByDay[day] || 0) + 1;
     }
     const fullyBookedDates = Object.entries(countByDay)
