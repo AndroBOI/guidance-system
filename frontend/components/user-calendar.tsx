@@ -156,6 +156,7 @@ export function CalendarBookedDates() {
               mode="single"
               selected={date}
               onSelect={setDate}
+              month={currentMonth}
               onMonthChange={setCurrentMonth}
               disabled={[{ before: today }, ...fullyBookedDates]}
               modifiers={{

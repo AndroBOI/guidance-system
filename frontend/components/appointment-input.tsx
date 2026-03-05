@@ -107,7 +107,6 @@ export function AppointmentForm({
       </CardHeader>
 
       <CardContent className="space-y-5 pt-2">
-        {/* Selected Date & Time Summary */}
         <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
           <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
           <div>
@@ -120,7 +119,7 @@ export function AppointmentForm({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* Root Error */}
+  
             {form.formState.errors.root && (
               <div className="flex items-center gap-3 text-red-600 px-4 py-3 rounded bg-red-50 border border-red-200">
                 <Info className="h-5 w-5 flex-shrink-0" />
@@ -128,7 +127,7 @@ export function AppointmentForm({
               </div>
             )}
 
-            {/* Title */}
+
             <FormField
               control={form.control}
               name="title"
@@ -157,7 +156,7 @@ export function AppointmentForm({
               )}
             />
 
-            {/* Concern */}
+  
             <FormField
               control={form.control}
               name="concern"
@@ -190,7 +189,7 @@ export function AppointmentForm({
               )}
             />
 
-            {/* Description */}
+      
             <FormField
               control={form.control}
               name="description"
@@ -222,7 +221,7 @@ export function AppointmentForm({
               )}
             />
 
-            {/* Buttons */}
+     
             <div className="flex gap-3 pt-2">
               <Button
                 type="button"
@@ -231,7 +230,7 @@ export function AppointmentForm({
                 onClick={onBack}
                 disabled={isLoading}
               >
-                ← Back
+                Back
               </Button>
               <Button
                 type="submit"

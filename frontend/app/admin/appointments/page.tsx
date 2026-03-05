@@ -127,6 +127,7 @@ export default function AdminAppointments() {
       <div className="w-full space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Appointments</h1>
+          
         </div>
 
         <div className="flex gap-2 flex-wrap">

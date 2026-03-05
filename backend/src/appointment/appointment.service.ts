@@ -51,7 +51,7 @@ export class AppointmentService {
   async getUserAppointments(userId: string) {
     return this.prisma.appointment.findMany({
       where: { userId },
-      orderBy: { date: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

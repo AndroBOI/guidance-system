@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,6 +67,9 @@ export default function History() {
       try {
         setLoading(true);
         const response = await api.get("/appointments/my");
+
+      
+
         setAppointments(response.data);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -106,7 +109,7 @@ export default function History() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="w-full space-y-6">
-        {/* Header */}
+      
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <HistoryIcon className="h-7 w-7 text-primary" />
@@ -118,11 +121,11 @@ export default function History() {
             </div>
           </div>
           <Button onClick={() => router.push("/profile/appointment/create")}>
-            + New Appointment
+            New Appointment
           </Button>
         </div>
 
-        {/* Empty State */}
+
         {appointments.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
@@ -153,9 +156,9 @@ export default function History() {
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-4">
-                      {/* Left - Info */}
+               
                       <div className="space-y-2 flex-1 min-w-0">
-                        {/* Title + Badge */}
+                 
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-base truncate">
                             {appointment.title}
@@ -165,7 +168,7 @@ export default function History() {
                           </Badge>
                         </div>
 
-                        {/* Concern */}
+              
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <AlertCircle className="h-4 w-4 flex-shrink-0" />
                           <span>
@@ -174,7 +177,7 @@ export default function History() {
                           </span>
                         </div>
 
-                        {/* Date & Time */}
+                 
                         <div className="flex items-center gap-4 flex-wrap">
                           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4 flex-shrink-0" />
@@ -193,7 +196,7 @@ export default function History() {
                           </div>
                         </div>
 
-                        {/* Description */}
+             
                         {appointment.description && (
                           <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <FileText className="h-4 w-4 flex-shrink-0 mt-0.5" />
@@ -204,7 +207,7 @@ export default function History() {
                         )}
                       </div>
 
-                      {/* Right - Status indicator */}
+                    
                       <div
                         className={`w-2 h-full min-h-[60px] rounded-full flex-shrink-0 ${
                           appointment.status === "ACCEPTED"
