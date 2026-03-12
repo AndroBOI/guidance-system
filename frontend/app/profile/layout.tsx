@@ -16,13 +16,11 @@ export default function ProfileLayout({ children }: LayoutProps) {
   const router = useRouter();
 
   useEffect(() => {
-
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
-  
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -30,7 +28,6 @@ export default function ProfileLayout({ children }: LayoutProps) {
       </div>
     );
   }
-
 
   if (!user) {
     return (
@@ -43,13 +40,17 @@ export default function ProfileLayout({ children }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <SidebarProvider>
-        <AppSidebar /> 
+        <AppSidebar />
+
         <main className="flex-1 p-4 overflow-auto">
-          <SidebarTrigger />
+          <div className="flex justify-between gap-5 items-center">
+            <SidebarTrigger />
+            <p>Hello</p>
+          </div>
+
           {children}
         </main>
       </SidebarProvider>
     </div>
   );
 }
- 
