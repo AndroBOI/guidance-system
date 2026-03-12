@@ -33,18 +33,27 @@ enum Gender {
   OTHER
 }
 
+enum NotificationType {
+  APPOINTMENT_CREATED
+  APPOINTMENT_ACCEPTED
+  APPOINTMENT_REJECTED
+  APPOINTMENT_REMINDER
+  SYSTEM
+}
+
 model User {
-  id                   String        @id @default(cuid())
-  email                String        @unique @db.VarChar(60)
+  id                   String         @id @default(cuid())
+  email                String         @unique @db.VarChar(60)
   password             String
-  role                 Role          @default(USER)
+  role                 Role           @default(USER)
   refreshToken         String?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
   appointments         Appointment[]
   profile              Profile?
-  approvedAppointments Appointment[] @relation("AdminApproved")
-} 
+  approvedAppointments Appointment[]  @relation("AdminApproved")
+  notifications        Notification[] @relation("UserNotifications")
+}
 
 model Profile {
   id          String   @id @default(cuid())
@@ -75,4 +84,18 @@ model Appointment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      NotificationType
+  title     String           @db.VarChar(100)
+  message   String           @db.VarChar(500)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId, isRead])
 }

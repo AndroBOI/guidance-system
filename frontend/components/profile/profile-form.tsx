@@ -351,7 +351,7 @@ export const ProfileForm = () => {
                     className="flex-1 h-10"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Creating..." : "Complete Profile ✓"}
+                    {isLoading ? "Creating..." : "Complete Profile "}
                   </Button>
                 )}
               </div>

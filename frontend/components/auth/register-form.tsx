@@ -39,19 +39,21 @@ const RegisterForm = () => {
         body: JSON.stringify(data),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        form.setError("root", {
+          type: "manual",
+          message: result.message || "Signup failed",
+        });
+        return;
       }
 
-      const result = await response.json();
       setUser(result);
       router.push("/login");
       console.log("Registration successful", result);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       form.setError("root", {
         type: "manual",
         message: "Network error. Please check your connection",
@@ -61,7 +63,6 @@ const RegisterForm = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex min-h-screen justify-center items-center px-5">
       <CardWrapper
