@@ -22,7 +22,7 @@ import { AdminModule } from './admin/admin.module';
     AppointmentModule,
     AdminModule,
   ],
-  controllers: [AppController, AdminController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
