@@ -1,3 +1,4 @@
+// app/profile/layout.tsx
 "use client";
 
 import { ReactNode, useEffect } from "react";
@@ -6,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-siderbar";
+import { NotificationBell } from "@/components/notification-bell";
 
 interface LayoutProps {
   children: ReactNode;
@@ -43,9 +45,9 @@ export default function ProfileLayout({ children }: LayoutProps) {
         <AppSidebar />
 
         <main className="flex-1 p-4 overflow-auto">
-          <div className="flex justify-between gap-5 items-center">
+          <div className="flex justify-between gap-5 items-center mb-4">
             <SidebarTrigger />
-            <p>Hello</p>
+            <NotificationBell /> {/* ← Add bell here */}
           </div>
 
           {children}

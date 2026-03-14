@@ -221,7 +221,7 @@ export default function AdminAppointments() {
                           </div>
                         </div>
 
-                        {/* Description */}
+                
                         {appointment.description && (
                           <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <FileText className="h-4 w-4 flex-shrink-0 mt-0.5" />
@@ -232,7 +232,6 @@ export default function AdminAppointments() {
                         )}
                       </div>
 
-                      {/* Action Buttons - Only for PENDING */}
                       {appointment.status === "PENDING" && (
                         <div className="flex gap-2">
                           <Button
