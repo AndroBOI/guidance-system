@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationService } from 'src/notification/notification.service';
+import { NotificationType } from 'src/notification/dto/create-notification.dto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
@@ -65,7 +71,6 @@ export class AdminService {
         this.prisma.appointment.count({ where: { status: 'ACCEPTED' } }),
       ]);
 
-    // Get today's appointments
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -92,7 +97,7 @@ export class AdminService {
     status: 'ACCEPTED' | 'REJECTED',
     adminId: string,
   ) {
-    return this.prisma.appointment.update({
+    const appointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status,
@@ -112,6 +117,32 @@ export class AdminService {
         },
       },
     });
+
+    // Use the enum, not string
+    const notifType: NotificationType =
+      status === 'ACCEPTED'
+        ? NotificationType.APPOINTMENT_ACCEPTED
+        : NotificationType.APPOINTMENT_REJECTED;
+
+    const title =
+      status === 'ACCEPTED' ? 'Appointment Accepted' : 'Appointment Rejected';
+
+    const appointmentDate = format(new Date(appointment.date), 'MMMM d, yyyy');
+    const appointmentTime = format(new Date(appointment.date), 'h:mm a');
+
+    const message =
+      status === 'ACCEPTED'
+        ? `Your appointment "${appointment.title}" has been accepted for ${appointmentDate} at ${appointmentTime}`
+        : `Your appointment "${appointment.title}" was not approved`;
+
+    await this.notificationService.create(
+      appointment.userId,
+      notifType,
+      title,
+      message,
+    );
+
+    return appointment;
   }
 
   async getUserById(userId: string) {

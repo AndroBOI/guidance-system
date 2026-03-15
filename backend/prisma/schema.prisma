@@ -34,7 +34,6 @@ enum Gender {
 }
 
 enum NotificationType {
-  APPOINTMENT_CREATED
   APPOINTMENT_ACCEPTED
   APPOINTMENT_REJECTED
   APPOINTMENT_REMINDER
@@ -46,7 +45,6 @@ model User {
   email                String         @unique @db.VarChar(60)
   password             String
   role                 Role           @default(USER)
-  refreshToken         String?
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   appointments         Appointment[]

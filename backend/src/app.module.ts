@@ -7,8 +7,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProfileModule } from './profile/profile.module';
 import { UserModule } from './user/user.module';
 import { AppointmentModule } from './appointment/appointment.module';
-import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -21,6 +21,7 @@ import { AdminModule } from './admin/admin.module';
     UserModule,
     AppointmentModule,
     AdminModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
