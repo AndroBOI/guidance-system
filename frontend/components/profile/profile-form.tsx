@@ -95,19 +95,19 @@ export const ProfileForm = () => {
   };
 
   return (
-    <div className="flex flex-col gap-y-8 min-h-screen justify-center items-center px-5 bg-gradient-to-br from-background to-muted/20">
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2">
-          <User className="h-8 w-8 text-primary" />
+    <div className="flex flex-col gap-y-6 sm:gap-y-8 min-h-dvh justify-center items-center px-4 sm:px-5 py-8 bg-gradient-to-br from-background to-muted/20">
+      <div className="text-center space-y-2 sm:space-y-3">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 mb-2">
+          <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold px-2">
           Complete Your Profile
         </h1>
       </div>
 
       <Card className="w-full max-w-lg shadow-lg">
-        <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-xl">
+        <CardHeader className="text-center space-y-2 px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">
             Step {step} of 2 •{" "}
             {step === 1 ? "Personal Info" : "Additional Details"}
           </CardTitle>
@@ -118,7 +118,7 @@ export const ProfileForm = () => {
           </p>
         </CardHeader>
 
-        <div className="px-6 pb-6">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               {form.formState.errors.root && (
@@ -179,9 +179,11 @@ export const ProfileForm = () => {
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          Middle Name{" "}
+                        <FormLabel className="flex items-center gap-2 flex-wrap">
+                          <span className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            Middle Name
+                          </span>
                           <span className="text-xs text-muted-foreground">
                             (Optional)
                           </span>
@@ -260,7 +262,7 @@ export const ProfileForm = () => {
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  "h-10 pl-3 text-left font-normal",
+                                  "h-10 pl-3 text-left font-normal w-full",
                                   !field.value && "text-muted-foreground",
                                 )}
                               >
@@ -269,11 +271,14 @@ export const ProfileForm = () => {
                                 ) : (
                                   <span>Pick a date</span>
                                 )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50 flex-shrink-0" />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
+                          <PopoverContent
+                            className="w-auto p-0 max-w-[calc(100vw-2rem)]"
+                            align="start"
+                          >
                             <Calendar
                               mode="single"
                               selected={field.value}
@@ -307,7 +312,7 @@ export const ProfileForm = () => {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="h-10">
+                            <SelectTrigger className="h-10 w-full">
                               <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                           </FormControl>

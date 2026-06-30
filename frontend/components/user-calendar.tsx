@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format, startOfDay, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { Clock, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppointmentForm } from "./appointment-input";
@@ -25,8 +25,6 @@ const ALL_TIME_SLOTS = [
   { label: "2:00 PM - 3:00 PM", value: "14:00" },
   { label: "3:00 PM - 4:00 PM", value: "15:00" },
 ];
-
-const TOTAL_SLOTS = ALL_TIME_SLOTS.length;
 
 type Step = "calendar" | "details";
 
@@ -130,7 +128,6 @@ export function CalendarBookedDates() {
             Select an available date then choose a time slot
           </p>
 
- 
           <div className="flex items-center justify-center gap-4 pt-2">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full bg-destructive/60" />
@@ -218,7 +215,7 @@ export function CalendarBookedDates() {
               disabled={!canProceed || loadingSlots}
               onClick={() => setStep("details")}
             >
-              Next 
+              Next
             </Button>
           </CardContent>
         </Card>

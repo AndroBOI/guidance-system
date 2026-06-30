@@ -48,10 +48,9 @@ export function NotificationBell() {
   useEffect(() => {
     void fetchNotifications();
 
-    // Poll every 60 seconds
     const interval = setInterval(() => {
       void fetchNotifications();
-    }, 60000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
@@ -59,7 +58,7 @@ export function NotificationBell() {
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await api.patch(`/notifications/${notificationId}/read`);
-      await fetchNotifications(); // Refresh
+      await fetchNotifications();
     } catch (error) {
       console.error("Failed to mark as read:", error);
     }
@@ -68,7 +67,7 @@ export function NotificationBell() {
   const handleMarkAllAsRead = async () => {
     try {
       await api.patch("/notifications/read-all");
-      await fetchNotifications(); // Refresh
+      await fetchNotifications();
     } catch (error) {
       console.error("Failed to mark all as read:", error);
     }

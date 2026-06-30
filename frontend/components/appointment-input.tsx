@@ -119,14 +119,12 @@ export function AppointmentForm({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-  
             {form.formState.errors.root && (
               <div className="flex items-center gap-3 text-red-600 px-4 py-3 rounded bg-red-50 border border-red-200">
                 <Info className="h-5 w-5 flex-shrink-0" />
                 <p className="text-sm">{form.formState.errors.root.message}</p>
               </div>
             )}
-
 
             <FormField
               control={form.control}
@@ -156,7 +154,6 @@ export function AppointmentForm({
               )}
             />
 
-  
             <FormField
               control={form.control}
               name="concern"
@@ -189,7 +186,6 @@ export function AppointmentForm({
               )}
             />
 
-      
             <FormField
               control={form.control}
               name="description"
@@ -221,7 +217,6 @@ export function AppointmentForm({
               )}
             />
 
-     
             <div className="flex gap-3 pt-2">
               <Button
                 type="button"

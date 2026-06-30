@@ -67,9 +67,6 @@ export default function History() {
       try {
         setLoading(true);
         const response = await api.get("/appointments/my");
-
-      
-
         setAppointments(response.data);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -107,28 +104,31 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-8">
       <div className="w-full space-y-6">
-      
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
-            <HistoryIcon className="h-7 w-7 text-primary" />
+            <HistoryIcon className="h-6 w-6 sm:h-7 sm:w-7 text-primary flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold">Appointment History</h1>
-              <p className="text-muted-foreground text-sm mt-0.5">
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Appointment History
+              </h1>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
                 View all your past and upcoming appointments
               </p>
             </div>
           </div>
-          <Button onClick={() => router.push("/profile/appointment/create")}>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => router.push("/profile/appointment/create")}
+          >
             New Appointment
           </Button>
         </div>
 
-
         {appointments.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+            <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-4 px-4 text-center">
               <div className="p-4 bg-primary/10 rounded-full">
                 <Calendar className="h-10 w-10 text-primary" />
               </div>
@@ -139,6 +139,7 @@ export default function History() {
                 </p>
               </div>
               <Button
+                className="w-full sm:w-auto"
                 onClick={() => router.push("/profile/appointment/create")}
               >
                 Book an Appointment
@@ -152,24 +153,24 @@ export default function History() {
               return (
                 <Card
                   key={appointment.id}
-                  className="hover:shadow-md transition-shadow"
+                  className="hover:shadow-md transition-shadow overflow-hidden"
                 >
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between gap-4">
-               
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-stretch gap-3 sm:gap-4">
                       <div className="space-y-2 flex-1 min-w-0">
-                 
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-semibold text-base truncate">
+                          <h3 className="font-semibold text-sm sm:text-base truncate max-w-[180px] sm:max-w-none">
                             {appointment.title}
                           </h3>
-                          <Badge variant="outline" className={status.className}>
+                          <Badge
+                            variant="outline"
+                            className={`${status.className} text-xs flex-shrink-0`}
+                          >
                             {status.label}
                           </Badge>
                         </div>
 
-              
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
                           <AlertCircle className="h-4 w-4 flex-shrink-0" />
                           <span>
                             {concernConfig[appointment.concern] ??
@@ -177,18 +178,17 @@ export default function History() {
                           </span>
                         </div>
 
-                 
-                        <div className="flex items-center gap-4 flex-wrap">
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4 flex-shrink-0" />
                             <span>
                               {format(
                                 new Date(appointment.date),
-                                "MMMM d, yyyy",
+                                "MMM d, yyyy",
                               )}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
                             <Clock className="h-4 w-4 flex-shrink-0" />
                             <span>
                               {format(new Date(appointment.date), "h:mm a")}
@@ -196,9 +196,8 @@ export default function History() {
                           </div>
                         </div>
 
-             
                         {appointment.description && (
-                          <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                          <div className="flex items-start gap-1.5 text-xs sm:text-sm text-muted-foreground">
                             <FileText className="h-4 w-4 flex-shrink-0 mt-0.5" />
                             <p className="line-clamp-2">
                               {appointment.description}
@@ -207,9 +206,8 @@ export default function History() {
                         )}
                       </div>
 
-                    
                       <div
-                        className={`w-2 h-full min-h-[60px] rounded-full flex-shrink-0 ${
+                        className={`w-1.5 sm:w-2 rounded-full flex-shrink-0 ${
                           appointment.status === "ACCEPTED"
                             ? "bg-green-500"
                             : appointment.status === "PENDING"

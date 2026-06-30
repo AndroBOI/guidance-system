@@ -1,4 +1,3 @@
-// app/profile/layout.tsx
 "use client";
 
 import { ReactNode, useEffect } from "react";
@@ -47,7 +46,7 @@ export default function ProfileLayout({ children }: LayoutProps) {
         <main className="flex-1 p-4 overflow-auto">
           <div className="flex justify-between gap-5 items-center mb-4">
             <SidebarTrigger />
-            <NotificationBell /> {/* ← Add bell here */}
+            <NotificationBell />
           </div>
 
           {children}
