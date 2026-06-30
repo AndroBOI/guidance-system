@@ -67,7 +67,7 @@ export default function AdminAppointments() {
     const fetchAppointments = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/admin/appointments");
+        const response = await api.get<Appointment[]>("/admin/appointments");
         setAppointments(response.data);
       } catch (error) {
         console.error("Failed to fetch appointments:", error);
@@ -221,7 +221,6 @@ export default function AdminAppointments() {
                           </div>
                         </div>
 
-                
                         {appointment.description && (
                           <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <FileText className="h-4 w-4 flex-shrink-0 mt-0.5" />
