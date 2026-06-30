@@ -64,6 +64,7 @@ export class AuthService {
       user.role,
       hasProfile,
     );
+    console.log(process.env.DATABASE_URL);
 
     return {
       access_token: token.access_token,

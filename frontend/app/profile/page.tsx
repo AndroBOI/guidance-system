@@ -125,12 +125,6 @@ export default function ProfilePage() {
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">My Profile</h1>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/profile/edit")}
-          >
-            Edit Profile
-          </Button>
         </div>
 
         <Card>

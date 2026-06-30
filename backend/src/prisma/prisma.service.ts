@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -8,12 +6,9 @@ import { Pool } from 'pg';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const pool = new Pool({
-      host: 'localhost',
-      port: 5432,
-      database: 'guidance_db',
-      user: 'postgres',
-      password: 'pg08102006',
+      connectionString: process.env.DATABASE_URL,
     });
 
     const adapter = new PrismaPg(pool);

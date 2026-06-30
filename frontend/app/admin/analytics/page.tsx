@@ -30,23 +30,23 @@ interface AnalyticsData {
 }
 
 const AnalyticsPage = () => {
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  // const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const response = await api.get("/admin/analytics");
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching analytics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAnalytics = async () => {
+  //     try {
+  //       const response = await api.get("/admin/analytics");
+  //       setData(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching analytics:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchAnalytics();
-  }, []);
+  //   fetchAnalytics();
+  // }, []);
 
   if (loading) {
     return (
@@ -86,18 +86,16 @@ const AnalyticsPage = () => {
     ],
   };
 
-  const displayData = data || mockData;
+  const displayData =  mockData;
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="w-full space-y-8">
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
           </div>
         </div>
-
 
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
           <Card>
