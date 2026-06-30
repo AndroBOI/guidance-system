@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -26,15 +25,19 @@ const CardWrapper = ({
   backButtonHref,
 }: CardWrapperProps) => {
   return (
-    <Card className="w-full max-w-sm ">
+    <Card className="w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl p-2 sm:p-4 lg:p-6">
       <CardHeader className="text-center">
-        <CardTitle>{cardTitle}</CardTitle>
-        <CardDescription>{cardDescription}</CardDescription>
+        <CardTitle className="text-xl sm:text-2xl lg:text-3xl">
+          {cardTitle}
+        </CardTitle>
+        <CardDescription className="text-sm sm:text-base lg:text-lg">
+          {cardDescription}
+        </CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>
       <CardFooter className="flex-col gap-2">
         <Link
-          className="text-sm hover:underline"
+          className="text-sm sm:text-base hover:underline"
           style={{ color: "var(--muted-foreground)" }}
           href={`${backButtonHref}`}
         >
@@ -43,6 +46,6 @@ const CardWrapper = ({
       </CardFooter>
     </Card>
   );
-}
+};
 
 export default CardWrapper;

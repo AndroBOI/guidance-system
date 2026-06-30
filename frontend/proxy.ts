@@ -11,7 +11,7 @@ interface JwtPayload {
   exp?: number;
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const token = req.cookies.get("access_token")?.value;
 
@@ -72,7 +72,6 @@ export async function middleware(req: NextRequest) {
       console.log("[Middleware] Admin trying to access user route");
       return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
-
 
     if (jwtPayload.role === "USER") {
       if (path === "/create/info" && jwtPayload.hasProfile) {

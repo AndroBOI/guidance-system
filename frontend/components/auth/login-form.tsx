@@ -51,7 +51,7 @@ export const LoginForm = () => {
       } else {
         throw new Error("Login succeeded but user not loaded");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Login failed:", error);
       form.setError("root", {
         type: "manual",
@@ -64,7 +64,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center px-5">
+    <div className="flex min-h-dvh justify-center items-center px-5">
       <CardWrapper
         cardTitle="Welcome Back"
         cardDescription="Please sign in to your account"
@@ -74,7 +74,7 @@ export const LoginForm = () => {
       >
         <Form {...form}>
           <form
-            className="space-y-5 w-full"
+            className="space-y-5 sm:space-y-6 lg:space-y-8 w-full"
             onSubmit={form.handleSubmit(handleLogin)}
           >
             {form.formState.errors.root && (
@@ -89,13 +89,14 @@ export const LoginForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm sm:text-base">Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       placeholder="john.doe@example.com"
                       type="email"
                       disabled={isLoading}
+                      className="h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
                     />
                   </FormControl>
                   <FormMessage />
@@ -108,13 +109,16 @@ export const LoginForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-sm sm:text-base">
+                    Password
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       placeholder="Enter Password"
                       type="password"
                       disabled={isLoading}
+                      className="h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
                     />
                   </FormControl>
                   <FormMessage />
@@ -122,7 +126,11 @@ export const LoginForm = () => {
               )}
             />
 
-            <Button className="w-full" type="submit" disabled={isLoading}>
+            <Button
+              className="w-full h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
+              type="submit"
+              disabled={isLoading}
+            >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
