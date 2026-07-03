@@ -52,6 +52,11 @@ export default function ProfilePage() {
           response.data.hasProfile === false
         ) {
           setProfile(null);
+        } else if (
+          "hasProfile" in response.data &&
+          typeof response.data.hasProfile === "object"
+        ) {
+          setProfile(response.data.hasProfile as Profile);
         } else {
           setProfile(response.data as Profile);
         }
@@ -190,7 +195,7 @@ export default function ProfilePage() {
                   Gender
                 </p>
                 <p className="font-medium capitalize">
-                  {profile.gender.toLowerCase()}
+                  {profile.gender?.toLowerCase() || "-"}
                 </p>
               </div>
 

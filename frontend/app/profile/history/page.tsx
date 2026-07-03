@@ -61,9 +61,7 @@ export default function History() {
     const fetchAppointments = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/appointments/my");
-
-
+        const response = await api.get<Appointment[]>("/appointments/my");
 
         setAppointments(response.data);
       } catch (err) {
@@ -95,10 +93,8 @@ export default function History() {
     </div>
   );
 
-
   return (
     <div className="w-full space-y-6">
-
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <HistoryIcon className="h-7 w-7 text-primary" />
@@ -114,7 +110,6 @@ export default function History() {
         </Button>
       </div>
 
-
       {appointments.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
@@ -127,9 +122,7 @@ export default function History() {
                 Book your first appointment to get started
               </p>
             </div>
-            <Button
-              onClick={() => router.push("/profile/appointment/create")}
-            >
+            <Button onClick={() => router.push("/profile/appointment/create")}>
               Book an Appointment
             </Button>
           </CardContent>
@@ -145,9 +138,7 @@ export default function History() {
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-4">
-
                     <div className="space-y-2 flex-1 min-w-0">
-
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-base truncate">
                           {appointment.title}
@@ -157,7 +148,6 @@ export default function History() {
                         </Badge>
                       </div>
 
-
                       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <AlertCircle className="h-4 w-4 flex-shrink-0" />
                         <span>
@@ -166,15 +156,11 @@ export default function History() {
                         </span>
                       </div>
 
-
                       <div className="flex items-center gap-4 flex-wrap">
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4 flex-shrink-0" />
                           <span>
-                            {format(
-                              new Date(appointment.date),
-                              "MMMM d, yyyy",
-                            )}
+                            {format(new Date(appointment.date), "MMMM d, yyyy")}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -184,7 +170,6 @@ export default function History() {
                           </span>
                         </div>
                       </div>
-
 
                       {appointment.description && (
                         <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -196,14 +181,14 @@ export default function History() {
                       )}
                     </div>
 
-
                     <div
-                      className={`w-2 h-full min-h-[60px] rounded-full flex-shrink-0 ${appointment.status === "ACCEPTED"
-                        ? "bg-green-500"
-                        : appointment.status === "PENDING"
-                          ? "bg-orange-400"
-                          : "bg-red-500"
-                        }`}
+                      className={`w-2 h-full min-h-[60px] rounded-full flex-shrink-0 ${
+                        appointment.status === "ACCEPTED"
+                          ? "bg-green-500"
+                          : appointment.status === "PENDING"
+                            ? "bg-orange-400"
+                            : "bg-red-500"
+                      }`}
                     />
                   </div>
                 </CardContent>
@@ -214,5 +199,4 @@ export default function History() {
       )}
     </div>
   );
-
 }
