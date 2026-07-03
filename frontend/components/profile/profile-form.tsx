@@ -1,5 +1,6 @@
 "use client";
 
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Card, CardTitle, CardHeader } from "../ui/card";
 import { Info, CalendarIcon, User, Phone, MapPin, Users } from "lucide-react";
@@ -67,31 +68,22 @@ export const ProfileForm = () => {
   const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit = async (data: ProfileFormValues) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(
-        "https://guidance-system-api.onrender.com/profile/create",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            ...data,
-            birthDate: data.birthDate.toISOString(),
-          }),
-        },
-      );
+    setIsLoading(true);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create profile");
-      }
+    try {
+      await api.post<ProfileFormValues>("/profile/create", {
+        ...data,
+        birthDate: data.birthDate.toISOString(),
+      });
 
       router.push("/profile/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       form.setError("root", {
-        message: error instanceof Error ? error.message : "An error occurred",
+        type: "manual",
+        message: error.response?.data?.message || "Failed to create profile",
       });
+
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

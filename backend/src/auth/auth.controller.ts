@@ -18,6 +18,15 @@ interface RequestUser {
   role: string;
 }
 
+const isProd = process.env.NODE_ENV === 'production';
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? ('none' as const) : ('lax' as const),
+  path: '/',
+};
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -31,11 +40,8 @@ export class AuthController {
     if (!result) throw new ForbiddenException('Signup failed');
 
     res.cookie('access_token', result.access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
       maxAge: 30 * 60 * 1000,
-      path: '/',
     });
 
     return {
@@ -53,11 +59,8 @@ export class AuthController {
     if (!result) throw new ForbiddenException('Signin failed');
 
     res.cookie('access_token', result.access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
       maxAge: 30 * 60 * 1000,
-      path: '/',
     });
 
     return {
@@ -73,12 +76,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     this.authService.logout(req.user.sub);
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-    });
+    res.clearCookie('access_token', cookieOptions);
     return { message: 'Logged out successfully' };
   }
 }

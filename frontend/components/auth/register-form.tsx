@@ -1,4 +1,5 @@
 "use client";
+import api from "@/lib/api";
 import { useState } from "react";
 import CardWrapper from "./card-wrapper";
 import { Info } from "lucide-react";
@@ -29,43 +30,31 @@ const RegisterForm = () => {
 
   const [user, setUser] = useState<RegisterFormValues | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const handleRegister = async (data: RegisterFormValues) => {
     setIsLoading(true);
+
     try {
-      const response = await fetch(
-        "https://guidance-system-api.onrender.com/auth/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
+      const response = await api.post<RegisterFormValues>("/auth/signup", data);
 
-      const result = await response.json();
+      setUser(response.data);
+      console.log("Registration successful", response.data);
 
-      if (!response.ok) {
-        form.setError("root", {
-          type: "manual",
-          message: result.message || "Signup failed",
-        });
-        return;
-      }
-
-      setUser(result);
-      router.push("/login");
-      console.log("Registration successful", result);
       form.reset();
-    } catch (error: unknown) {
+      router.push("/login");
+    } catch (error: any) {
       form.setError("root", {
         type: "manual",
-        message: "Network error. Please check your connection",
+        message:
+          error.response?.data?.message ||
+          "Network error. Please check your connection",
       });
+
       console.error("Registration failed", error);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="flex min-h-dvh justify-center items-center px-5">
       <CardWrapper

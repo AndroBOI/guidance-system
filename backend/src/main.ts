@@ -12,7 +12,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: ['https://ecounsel-olive.vercel.app'],
+    origin: 'http://localhost:3000',
     credentials: true,
   });
   await app.listen(process.env.PORT ?? 5000);

@@ -127,7 +127,7 @@ export default function UsersPage() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="w-full space-y-6">
-        {/* Header */}
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Users</h1>
@@ -180,7 +180,7 @@ export default function UsersPage() {
           </Card>
         </div>
 
-        {/* Users List */}
+
         <div className="space-y-3">
           {users.map((user) => (
             <Card key={user.id} className="hover:shadow-md transition-shadow">
@@ -247,7 +247,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* User Profile Dialog */}
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -260,7 +260,7 @@ export default function UsersPage() {
             </div>
           ) : selectedUser ? (
             <div className="space-y-6">
-              {/* Profile Info */}
+
               {selectedUser.profile ? (
                 <div className="space-y-4">
                   <Card>
@@ -351,7 +351,7 @@ export default function UsersPage() {
                 </Card>
               )}
 
-              {/* Appointments */}
+    
               <div>
                 <h3 className="font-semibold mb-3">
                   Appointments ({selectedUser._count.appointments})

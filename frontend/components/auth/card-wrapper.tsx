@@ -37,7 +37,7 @@ const CardWrapper = ({
       <CardContent>{children}</CardContent>
       <CardFooter className="flex-col gap-2">
         <Link
-          className="text-sm sm:text-base hover:underline"
+          className="text-sm sm:text-base text-red-700 hover:underline "
           style={{ color: "var(--muted-foreground)" }}
           href={`${backButtonHref}`}
         >
