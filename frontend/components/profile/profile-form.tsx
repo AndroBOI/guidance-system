@@ -69,15 +69,18 @@ export const ProfileForm = () => {
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:5000/profile/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          ...data,
-          birthDate: data.birthDate.toISOString(),
-        }),
-      });
+      const response = await fetch(
+        "https://guidance-system-api.onrender.com/profile/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            ...data,
+            birthDate: data.birthDate.toISOString(),
+          }),
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
