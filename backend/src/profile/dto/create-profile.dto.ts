@@ -7,7 +7,7 @@ import {
   IsOptional,
   ValidateIf,
 } from 'class-validator';
-import { Gender } from 'generated/prisma/enums';
+import { Gender } from 'src/generated/prisma/enums';
 
 export class CreateProfileDto {
   @IsString()
