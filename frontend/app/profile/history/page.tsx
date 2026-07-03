@@ -66,7 +66,7 @@ export default function History() {
     const fetchAppointments = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/appointments/my");
+        const response = await api.get<Appointment[]>("/appointments/my");
         setAppointments(response.data);
       } catch (err) {
         console.error("Error fetching appointments:", err);

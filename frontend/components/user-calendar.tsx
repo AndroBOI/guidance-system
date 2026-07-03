@@ -47,11 +47,14 @@ export function CalendarBookedDates() {
       try {
         setLoadingDates(true);
 
-        const response = await api.get("/appointments/fully-booked-dates", {
-          params: {
-            month: format(currentMonth, "yyyy-MM"),
+        const response = await api.get<{ fullyBookedDates: string[] }>(
+          "/appointments/fully-booked-dates",
+          {
+            params: {
+              month: format(currentMonth, "yyyy-MM"),
+            },
           },
-        });
+        );
 
         const dates: Date[] = response.data.fullyBookedDates.map(
           (d: string) => new Date(d),
@@ -77,11 +80,14 @@ export function CalendarBookedDates() {
         setSelectedTime(undefined);
         setBookedSlots([]);
 
-        const response = await api.get("/appointments/booked-slots", {
-          params: {
-            date: format(date, "yyyy-MM-dd"),
+        const response = await api.get<{ bookedSlots: string[] }>(
+          "/appointments/booked-slots",
+          {
+            params: {
+              date: format(date, "yyyy-MM-dd"),
+            },
           },
-        });
+        );
 
         setBookedSlots(response.data.bookedSlots);
       } catch (error) {

@@ -23,6 +23,10 @@ interface Profile {
   };
 }
 
+interface NoProfileResponse {
+  hasProfile: false;
+}
+
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -39,11 +43,18 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/profile/me");
+        const response = await api.get<Profile | NoProfileResponse>(
+          "/profile/me",
+        );
         console.log("Response:", response.data);
-
-        const profileData = response.data.hasProfile || response.data;
-        setProfile(profileData);
+        if (
+          "hasProfile" in response.data &&
+          response.data.hasProfile === false
+        ) {
+          setProfile(null);
+        } else {
+          setProfile(response.data as Profile);
+        }
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile");

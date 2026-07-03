@@ -35,7 +35,9 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/admin/dashboard/stats");
+        const response = await api.get<DashboardStats>(
+          "/admin/dashboard/stats",
+        );
         setStats(response.data);
       } catch (error) {
         console.error("Error fetching stats:", error);
@@ -94,7 +96,7 @@ export default function AdminDashboard() {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Today's Sessions
+                Today&apos;s Sessions
               </CardTitle>
               <Clock className="h-4 w-4 text-orange-500" />
             </CardHeader>
