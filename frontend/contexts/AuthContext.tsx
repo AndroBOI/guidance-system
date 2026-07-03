@@ -48,7 +48,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         await fetchUser();
       } catch {
-
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -66,7 +65,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<User> => {
     try {
       console.log("[AuthContext] Logging in...");
-      const response = await api.post("/auth/signin", { email, password });
+      const response = await api.post<{ user: User }>("/auth/signin", {
+        email,
+        password,
+      });
 
       console.log("[AuthContext] Login response:", response.data);
 

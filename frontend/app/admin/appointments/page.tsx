@@ -104,7 +104,7 @@ export default function AdminAppointments() {
       ? appointments
       : appointments.filter((a) => a.status === filter);
 
-  // Loading state
+
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center">
