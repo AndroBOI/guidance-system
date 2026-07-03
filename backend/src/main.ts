@@ -12,10 +12,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://properties-bachelor-lobby-diff.trycloudflare.com',
-    ],
+    origin: ['https://ecounsel-olive.vercel.app'],
     credentials: true,
   });
   await app.listen(process.env.PORT ?? 5000);
