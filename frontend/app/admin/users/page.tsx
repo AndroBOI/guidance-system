@@ -66,12 +66,11 @@ export default function UsersPage() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/admin/users");
+        const response = await api.get<UserData[]>("/admin/users");
         setUsers(response.data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -83,12 +82,11 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  // View user profile
   const handleViewUser = async (userId: string) => {
     try {
       setProfileLoading(true);
       setIsDialogOpen(true);
-      const response = await api.get(`/admin/users/${userId}`);
+      const response = await api.get<UserProfile>(`/admin/users/${userId}`);
       setSelectedUser(response.data);
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
@@ -142,7 +140,6 @@ export default function UsersPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
           <Card>
             <CardContent className="pt-6">
