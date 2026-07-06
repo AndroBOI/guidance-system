@@ -17,20 +17,18 @@ export default function ProfileLayout({ children }: LayoutProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    if (loading) return;
+
+    if (!user) {
+      router.replace("/login");
+    } else if (user.role !== "USER") {
+      router.replace("/admin/dashboard");
     }
   }, [loading, user, router]);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <Spinner className="size-20 text-primary" />
-      </div>
-    );
-  }
+  const isAuthorized = !loading && !!user && user.role === "USER";
 
-  if (!user) {
+  if (!isAuthorized) {
     return (
       <div className="h-screen flex justify-center items-center">
         <Spinner className="size-20 text-primary" />
