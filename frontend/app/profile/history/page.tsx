@@ -79,19 +79,21 @@ export default function History() {
     return <PageLoader fullScreen={false} />;
   }
 
-  return (
-    <div className="w-full flex justify-center items-center p-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="pt-6 text-center space-y-4">
-          <AlertCircle className="h-10 w-10 text-destructive mx-auto" />
-          <p className="text-destructive font-medium">{error}</p>
-          <Button onClick={() => router.push("/dashboard")}>
-            Back to Dashboard
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="w-full flex justify-center items-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 text-center space-y-4">
+            <AlertCircle className="h-10 w-10 text-destructive mx-auto" />
+            <p className="text-destructive font-medium">{error}</p>
+            <Button onClick={() => router.push("/profile/dashboard")}>
+              Back to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6">

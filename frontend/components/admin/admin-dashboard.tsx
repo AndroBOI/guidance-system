@@ -28,7 +28,7 @@ export default function AdminDashboard() {
     }
 
     if (!authLoading && user?.role !== "ADMIN") {
-      router.push("/dashboard");
+      router.push("/profile/dashboard");
       return;
     }
 
