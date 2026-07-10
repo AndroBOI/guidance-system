@@ -97,17 +97,19 @@ export default function History() {
 
   return (
     <div className="w-full space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <HistoryIcon className="h-7 w-7 text-primary" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent sm:h-11 sm:w-11 sm:bg-transparent sm:p-0">
+            <HistoryIcon className="h-6 w-6 text-primary sm:h-7 sm:w-7" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold">Appointment History</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">
+            <h1 className="text-2xl sm:text-3xl font-bold">Appointment History</h1>
+            <p className="text-muted-foreground text-sm mt-1 sm:mt-0.5">
               View all your past and upcoming appointments
             </p>
           </div>
         </div>
-        <Button onClick={() => router.push("/profile/appointment/create")}>
+        <Button className="w-full sm:w-auto mt-2 sm:mt-0" onClick={() => router.push("/profile/appointment/create")}>
           New Appointment
         </Button>
       </div>

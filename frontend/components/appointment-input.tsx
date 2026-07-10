@@ -77,6 +77,7 @@ export function AppointmentForm({
       });
 
       router.push("/profile/history");
+      router.refresh();
     } catch (error) {
       console.error("Failed to create appointment:", error);
       form.setError("root", {
