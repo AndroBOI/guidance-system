@@ -71,14 +71,11 @@ export class AdminService {
         this.prisma.appointment.count({ where: { status: 'ACCEPTED' } }),
       ]);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
 
     const todayAppointments = await this.prisma.appointment.count({
       where: {
-        date: { gte: today, lt: tomorrow },
+        date: todayStr,
         status: { not: 'REJECTED' },
       },
     });
@@ -127,8 +124,12 @@ export class AdminService {
     const title =
       status === 'ACCEPTED' ? 'Appointment Accepted' : 'Appointment Rejected';
 
-    const appointmentDate = format(new Date(appointment.date), 'MMMM d, yyyy');
-    const appointmentTime = format(new Date(appointment.date), 'h:mm a');
+    const [year, month, day] = appointment.date.split('-').map(Number);
+    const [hours, minutes] = appointment.time.split(':').map(Number);
+    const dateObj = new Date(year, month - 1, day, hours, minutes);
+
+    const appointmentDate = format(dateObj, 'MMMM d, yyyy');
+    const appointmentTime = format(dateObj, 'h:mm a');
 
     const message =
       status === 'ACCEPTED'

@@ -67,16 +67,13 @@ export function AppointmentForm({
   const onSubmit = async (data: AppointmentFormValues) => {
     try {
       setIsLoading(true);
-
-      const [hours, minutes] = time.split(":").map(Number);
-      const appointmentDate = new Date(date);
-      appointmentDate.setHours(hours, minutes, 0, 0);
-
+      const formattedDate = format(date, "yyyy-MM-dd");
       await api.post("/appointments/create", {
         title: data.title,
         concern: data.concern,
         description: data.description || undefined,
-        date: appointmentDate.toISOString(),
+        date: formattedDate,
+        time: time,
       });
 
       router.push("/profile/history");

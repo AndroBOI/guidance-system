@@ -75,7 +75,8 @@ model Appointment {
   title       String            @db.VarChar(100)
   concern     Concern
   description String?           @db.VarChar(500)
-  date        DateTime
+  date        String            @db.VarChar(20) 
+  time        String            @db.VarChar(20) 
   status      AppointmentStatus @default(PENDING)
   approvedBy  User?             @relation("AdminApproved", fields: [adminId], references: [id])
   adminId     String?
