@@ -4,9 +4,24 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { User, Mail, Phone, MapPin, Calendar, Users } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Users,
+  IdCard,
+} from "lucide-react";
 import api from "@/lib/api";
 
 interface Profile {
@@ -101,9 +116,9 @@ export default function ProfilePage() {
   if (error) {
     return (
       <div className="min-h-screen flex justify-center items-center p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-sm">
           <CardContent className="pt-6">
-            <p className="text-red-600 text-center">{error}</p>
+            <p className="text-destructive text-center text-sm">{error}</p>
             <Button
               onClick={() => router.push("/profile/dashboard")}
               className="w-full mt-4"
@@ -119,9 +134,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen flex justify-center items-center p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-sm">
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
+            <p className="text-center text-muted-foreground text-sm">
               No profile found
             </p>
             <Button
@@ -136,77 +151,94 @@ export default function ProfilePage() {
     );
   }
 
+  const fullName = `${profile.firstName} ${
+    profile.middleName ? `${profile.middleName} ` : ""
+  }${profile.lastName}`;
+
+  const initials = `${profile.firstName?.[0] ?? ""}${
+    profile.lastName?.[0] ?? ""
+  }`.toUpperCase();
+
+  const infoRows = [
+    { label: "Full Name", value: fullName, icon: User },
+    { label: "Email", value: profile.user?.email || user?.email, icon: Mail },
+    { label: "Phone Number", value: profile.phoneNumber, icon: Phone },
+    {
+      label: "Age",
+      value: `${calculateAge(profile.birthDate)} years old`,
+      icon: Calendar,
+    },
+    {
+      label: "Gender",
+      value: profile.gender?.toLowerCase() || "-",
+      icon: Users,
+      capitalize: true,
+    },
+    { label: "Address", value: profile.address, icon: MapPin },
+  ];
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent">
+            <IdCard className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              My Profile
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Your personal information on file
+            </p>
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Personal Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Full Name</p>
-                <p className="font-medium">
-                  {profile.firstName}{" "}
-                  {profile.middleName && `${profile.middleName} `}
-                  {profile.lastName}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </p>
-                <p className="font-medium">
-                  {profile.user?.email || user?.email}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Phone className="h-4 w-4" />
-                  Phone Number
-                </p>
-                <p className="font-medium">{profile.phoneNumber}</p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  Age
-                </p>
-                <p className="font-medium">
-                  {calculateAge(profile.birthDate)} years old
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  Gender
-                </p>
-                <p className="font-medium capitalize">
-                  {profile.gender?.toLowerCase() || "-"}
-                </p>
-              </div>
-
-              <div className="space-y-1 md:col-span-2">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  Address
-                </p>
-                <p className="font-medium">{profile.address}</p>
-              </div>
+        {/* Identity summary */}
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-accent">
+              <span className="text-lg font-semibold text-primary">
+                {initials}
+              </span>
             </div>
+            <div className="min-w-0">
+              <p className="truncate text-lg font-semibold">{fullName}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {profile.user?.email || user?.email}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal information table */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>
+              Details associated with your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-0">
+            {infoRows.map((row, idx) => (
+              <div key={row.label}>
+                <div className="flex items-center justify-between gap-4 py-3">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <row.icon className="h-4 w-4 shrink-0" />
+                    <span className="text-sm">{row.label}</span>
+                  </div>
+                  <span
+                    className={`text-sm font-medium text-right ${
+                      row.capitalize ? "capitalize" : ""
+                    }`}
+                  >
+                    {row.value || "-"}
+                  </span>
+                </div>
+                {idx < infoRows.length - 1 && <Separator />}
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
