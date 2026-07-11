@@ -9,6 +9,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      if (error.config?.url === "/users/me") {
+        return Promise.reject(error);
+      }
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.includes("/login")

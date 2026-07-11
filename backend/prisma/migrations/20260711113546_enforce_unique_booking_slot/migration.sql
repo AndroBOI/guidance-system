@@ -1,0 +1,2 @@
+-- Enforce partial unique constraint on Appointment date and time, ignoring REJECTED appointments
+CREATE UNIQUE INDEX "Appointment_date_time_unique" ON "Appointment"("date", "time") WHERE status != 'REJECTED';

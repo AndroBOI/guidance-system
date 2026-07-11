@@ -1,7 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoginSchema } from "@/schemas";
 import CardWrapper from "./card-wrapper";
 import {
@@ -17,13 +17,27 @@ import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
 
 export const LoginForm = () => {
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      if (user.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else if (!user.hasProfile) {
+        router.replace("/create/info");
+      } else {
+        router.replace("/profile/dashboard");
+      }
+    }
+  }, [user, loading, router]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),

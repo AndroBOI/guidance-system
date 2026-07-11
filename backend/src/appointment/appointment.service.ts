@@ -23,29 +23,38 @@ export class AppointmentService {
       );
     }
 
-    return this.prisma.appointment.create({
-      data: {
-        title: dto.title,
-        concern: dto.concern,
-        description: dto.description,
-        date: dto.date,
-        time: dto.time,
-        userId,
-      },
-      include: {
-        user: {
-          select: {
-            email: true,
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
+    try {
+      return await this.prisma.appointment.create({
+        data: {
+          title: dto.title,
+          concern: dto.concern,
+          description: dto.description,
+          date: dto.date,
+          time: dto.time,
+          userId,
+        },
+        include: {
+          user: {
+            select: {
+              email: true,
+              profile: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        throw new BadRequestException(
+          'This time slot is already booked. Please choose another.',
+        );
+      }
+      throw error;
+    }
   }
 
   async getUserAppointments(userId: string) {

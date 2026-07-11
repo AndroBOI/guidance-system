@@ -52,7 +52,7 @@ interface Notification {
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -73,7 +73,7 @@ export default function Dashboard() {
           api.get<Appointment[]>("/appointments/my"),
           api.get<Notification[]>("/notifications"),
         ]);
-        
+
         if (isMounted) {
           setAppointments(apptsRes.data);
           setNotifications(notifsRes.data);
@@ -128,13 +128,19 @@ export default function Dashboard() {
   const upcomingAppointments = useMemo(() => {
     return appointments
       .filter((appt) => appt.status === "ACCEPTED" || appt.status === "PENDING")
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
       .slice(0, 3);
   }, [appointments]);
 
   const recentActivity = useMemo(() => {
     return notifications
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
       .slice(0, 5); // top 5
   }, [notifications]);
 
@@ -185,12 +191,16 @@ export default function Dashboard() {
                 Welcome back, <span className="capitalize">{firstName}</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1 sm:mt-0">
-                Here's what's happening with your appointments today.
+                Here&apos;s what&apos;s happening with your appointments today.
               </p>
             </div>
           </div>
 
-          <Link href="/profile/history" passHref className="w-full sm:w-auto mt-2 sm:mt-0">
+          <Link
+            href="/profile/appointment/create"
+            passHref
+            className="w-full sm:w-auto mt-2 sm:mt-0"
+          >
             <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Book Appointment
@@ -221,7 +231,9 @@ export default function Dashboard() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Recent Appointments</CardTitle>
-                <CardDescription>Your latest scheduled sessions</CardDescription>
+                <CardDescription>
+                  Your latest scheduled sessions
+                </CardDescription>
               </div>
               <Link
                 href={"/profile/history"}
@@ -248,7 +260,13 @@ export default function Dashboard() {
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium">{new Date(appt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                        <p className="font-medium">
+                          {new Date(appt.date).toLocaleDateString(undefined, {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {appt.time} - {appt.title}
                         </p>
@@ -294,7 +312,9 @@ export default function Dashboard() {
                     </div>
                     <div className="space-y-0.5">
                       <p className="text-sm leading-snug">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">{formatTimeAgo(item.createdAt)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatTimeAgo(item.createdAt)}
+                      </p>
                     </div>
                   </div>
                 ))

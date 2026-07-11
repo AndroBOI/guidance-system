@@ -4,7 +4,15 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Info, FileText, Tag, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  FileText,
+  Tag,
+  AlertCircle,
+  CalendarCheck2,
+  AlertTriangle,
+  Loader2,
+  ChevronLeft,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { format } from "date-fns";
@@ -78,11 +86,18 @@ export function AppointmentForm({
 
       router.push("/profile/history");
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create appointment:", error);
+      let message = "Failed to create appointment. Please try again.";
+      const backendMessage = error.response?.data?.message;
+      if (typeof backendMessage === "string") {
+        message = backendMessage;
+      } else if (Array.isArray(backendMessage) && backendMessage.length > 0) {
+        message = backendMessage[0];
+      }
       form.setError("root", {
         type: "manual",
-        message: "Failed to create appointment. Please try again.",
+        message: message,
       });
     } finally {
       setIsLoading(false);
@@ -93,34 +108,49 @@ export function AppointmentForm({
   const title = form.watch("title") ?? "";
 
   return (
-    <Card className="w-full max-w-lg shadow-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
-          Appointment Details
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Fill in the details for your appointment
-        </p>
-      </CardHeader>
+    <Card className="w-full max-w-lg shadow-sm">
+      <CardHeader className="space-y-3 pb-4">
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={isLoading}
+          className="-ml-2 flex w-fit items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to calendar
+        </button>
 
-      <CardContent className="space-y-5 pt-2">
-        <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
-          <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-primary">
+        <div>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileText className="h-5 w-5 text-primary" />
+            Appointment Details
+          </CardTitle>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Fill in a few details so we know what to prepare for
+          </p>
+        </div>
+
+        {/* Confirmed date/time */}
+        <div className="flex items-center gap-3 rounded-lg bg-accent p-3">
+          <CalendarCheck2 className="h-4 w-4 shrink-0 text-primary" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">
               {format(date, "EEEE, MMMM d, yyyy")}
             </p>
             <p className="text-xs text-muted-foreground">{timeLabel}</p>
           </div>
         </div>
+      </CardHeader>
 
+      <CardContent className="pt-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {form.formState.errors.root && (
-              <div className="flex items-center gap-3 text-red-600 px-4 py-3 rounded bg-red-50 border border-red-200">
-                <Info className="h-5 w-5 flex-shrink-0" />
-                <p className="text-sm">{form.formState.errors.root.message}</p>
+              <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.root.message}
+                </p>
               </div>
             )}
 
@@ -129,7 +159,7 @@ export function AppointmentForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
+                  <FormLabel className="flex items-center gap-2 text-sm font-medium">
                     <Tag className="h-4 w-4 text-muted-foreground" />
                     Title
                   </FormLabel>
@@ -138,14 +168,14 @@ export function AppointmentForm({
                       {...field}
                       placeholder="e.g. Academic advising session"
                       disabled={isLoading}
-                      className="h-10"
+                      className="h-11"
                       maxLength={100}
                     />
                   </FormControl>
                   <div className="flex items-center justify-between">
                     <FormMessage />
-                    <p className="text-xs text-muted-foreground ml-auto">
-                      {title.length} / 100
+                    <p className="ml-auto text-xs text-muted-foreground">
+                      {title.length}/100
                     </p>
                   </div>
                 </FormItem>
@@ -157,7 +187,7 @@ export function AppointmentForm({
               name="concern"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
+                  <FormLabel className="flex items-center gap-2 text-sm font-medium">
                     <AlertCircle className="h-4 w-4 text-muted-foreground" />
                     Concern
                   </FormLabel>
@@ -167,13 +197,17 @@ export function AppointmentForm({
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Select a concern..." />
+                      <SelectTrigger className="h-11 w-full border-input data-[placeholder]:text-muted-foreground">
+                        <SelectValue placeholder="Select what this is about..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {concerns.map((c) => (
-                        <SelectItem key={c.value} value={c.value}>
+                        <SelectItem
+                          key={c.value}
+                          value={c.value}
+                          className="h-10"
+                        >
                           {c.label}
                         </SelectItem>
                       ))}
@@ -189,48 +223,51 @@ export function AppointmentForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
+                  <FormLabel className="flex items-center gap-2 text-sm font-medium">
                     <FileText className="h-4 w-4 text-muted-foreground" />
-                    Description{" "}
-                    <span className="text-xs text-muted-foreground font-normal">
+                    Description
+                    <span className="text-xs font-normal text-muted-foreground">
                       (Optional)
                     </span>
                   </FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Describe your concern in detail..."
-                      className="min-h-[120px] resize-none"
+                      placeholder="Anything you'd like the counselor to know beforehand..."
+                      className="min-h-[110px]  resize-none border-gray-200 border-2 placeholder:text-gray-500 font-thin"
                       disabled={isLoading}
                       maxLength={500}
                     />
                   </FormControl>
                   <div className="flex items-center justify-between">
                     <FormMessage />
-                    <p className="text-xs text-muted-foreground ml-auto">
-                      {description.length} / 500
+                    <p className="ml-auto text-xs text-muted-foreground">
+                      {description.length}/500
                     </p>
                   </div>
                 </FormItem>
               )}
             />
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1 h-11"
+                className="h-11 sm:flex-1"
                 onClick={onBack}
                 disabled={isLoading}
               >
                 Back
               </Button>
-              <Button
-                type="submit"
-                className="flex-1 h-11"
-                disabled={isLoading}
-              >
-                {isLoading ? "Submitting..." : "Submit Appointment"}
+              <Button type="submit" className="h-11 sm:flex-1" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Appointment"
+                )}
               </Button>
             </div>
           </form>

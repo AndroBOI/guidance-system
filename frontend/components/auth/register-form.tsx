@@ -1,6 +1,7 @@
 "use client";
 import api from "@/lib/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import CardWrapper from "./card-wrapper";
 import { Info } from "lucide-react";
 import { RegisterSchema } from "@/schemas";
@@ -23,6 +24,19 @@ type RegisterFormValues = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
   const router = useRouter();
+  const { user: authUser, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && authUser) {
+      if (authUser.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else if (!authUser.hasProfile) {
+        router.replace("/create/info");
+      } else {
+        router.replace("/profile/dashboard");
+      }
+    }
+  }, [authUser, authLoading, router]);
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: { email: "", password: "" },
