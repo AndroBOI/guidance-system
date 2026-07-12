@@ -167,20 +167,7 @@ export function CalendarBookedDates() {
                 Choose a date
               </CardTitle>
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
-                  <span className="text-xs text-muted-foreground">
-                    Fully booked
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-primary" />
-                  <span className="text-xs text-muted-foreground">
-                    Selected
-                  </span>
-                </div>
-              </div>
+            
             </div>
           </CardHeader>
 

@@ -9,7 +9,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
-  ) {}
+  ) { }
 
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
@@ -115,7 +115,6 @@ export class AdminService {
       },
     });
 
-    // Use the enum, not string
     const notifType: NotificationType =
       status === 'ACCEPTED'
         ? NotificationType.APPOINTMENT_ACCEPTED

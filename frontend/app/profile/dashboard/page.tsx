@@ -67,7 +67,11 @@ export default function Dashboard() {
     let isMounted = true;
 
     const fetchData = async () => {
-      if (!user) return;
+      if (!user) {
+        if (isMounted) setDataLoading(false);
+        return;
+      }
+      
       try {
         const [apptsRes, notifsRes] = await Promise.all([
           api.get<Appointment[]>("/appointments/my"),
@@ -77,16 +81,18 @@ export default function Dashboard() {
         if (isMounted) {
           setAppointments(apptsRes.data);
           setNotifications(notifsRes.data);
-          setDataLoading(false);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+      } finally {
         if (isMounted) setDataLoading(false);
       }
     };
 
     if (user) {
       fetchData();
+    } else {
+      setDataLoading(false);
     }
 
     return () => {

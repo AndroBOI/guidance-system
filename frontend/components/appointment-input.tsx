@@ -109,7 +109,7 @@ export function AppointmentForm({
 
   return (
     <Card className="w-full max-w-lg shadow-sm">
-      <CardHeader className="space-y-3 pb-4">
+      <CardHeader className="space-y-2.5 pb-4 sm:space-y-3">
         <button
           type="button"
           onClick={onBack}
@@ -121,7 +121,7 @@ export function AppointmentForm({
         </button>
 
         <div>
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <FileText className="h-5 w-5 text-primary" />
             Appointment Details
           </CardTitle>
@@ -131,7 +131,7 @@ export function AppointmentForm({
         </div>
 
         {/* Confirmed date/time */}
-        <div className="flex items-center gap-3 rounded-lg bg-accent p-3">
+        <div className="flex items-center gap-3 rounded-lg bg-accent p-2.5 sm:p-3">
           <CalendarCheck2 className="h-4 w-4 shrink-0 text-primary" />
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">
@@ -144,7 +144,7 @@ export function AppointmentForm({
 
       <CardContent className="pt-0">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
             {form.formState.errors.root && (
               <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
                 <AlertTriangle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
@@ -234,7 +234,7 @@ export function AppointmentForm({
                     <Textarea
                       {...field}
                       placeholder="Anything you'd like the counselor to know beforehand..."
-                      className="min-h-[110px]  resize-none border-gray-200 border-2 placeholder:text-gray-500 font-thin"
+                      className="min-h-[90px] resize-none sm:min-h-[110px]"
                       disabled={isLoading}
                       maxLength={500}
                     />

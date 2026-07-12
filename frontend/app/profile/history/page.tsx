@@ -15,6 +15,7 @@ import {
   History as HistoryIcon,
 } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 
 interface Appointment {
@@ -30,15 +31,18 @@ interface Appointment {
 const statusConfig = {
   PENDING: {
     label: "Pending",
-    className: "bg-orange-100 text-orange-700 border-orange-200",
+    badgeClassName: "bg-muted text-muted-foreground border-border",
+    barClassName: "bg-muted-foreground/40",
   },
   ACCEPTED: {
     label: "Accepted",
-    className: "bg-green-100 text-green-700 border-green-200",
+    badgeClassName: "bg-primary/10 text-primary border-primary/20",
+    barClassName: "bg-primary",
   },
   REJECTED: {
     label: "Rejected",
-    className: "bg-red-100 text-red-700 border-red-200",
+    badgeClassName: "bg-destructive/10 text-destructive border-destructive/20",
+    barClassName: "bg-destructive",
   },
 };
 
@@ -82,7 +86,7 @@ export default function History() {
   if (error) {
     return (
       <div className="w-full flex justify-center items-center p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-sm">
           <CardContent className="pt-6 text-center space-y-4">
             <AlertCircle className="h-10 w-10 text-destructive mx-auto" />
             <p className="text-destructive font-medium">{error}</p>
@@ -96,33 +100,38 @@ export default function History() {
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent sm:h-11 sm:w-11 sm:bg-transparent sm:p-0">
-            <HistoryIcon className="h-6 w-6 text-primary sm:h-7 sm:w-7" />
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent">
+            <HistoryIcon className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Appointment History</h1>
-            <p className="text-muted-foreground text-sm mt-1 sm:mt-0.5">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Appointment History
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
               View all your past and upcoming appointments
             </p>
           </div>
         </div>
-        <Button className="w-full sm:w-auto mt-2 sm:mt-0" onClick={() => router.push("/profile/appointment/create")}>
+        <Button
+          className="w-full sm:w-auto"
+          onClick={() => router.push("/profile/appointment/create")}
+        >
           New Appointment
         </Button>
       </div>
 
       {appointments.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-            <div className="p-4 bg-primary/10 rounded-full">
-              <Calendar className="h-10 w-10 text-primary" />
+        <Card className="shadow-sm">
+          <CardContent className="flex flex-col items-center justify-center gap-4 py-16">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+              <Calendar className="h-6 w-6 text-primary" />
             </div>
-            <div className="text-center space-y-1">
-              <p className="font-semibold text-lg">No appointments yet</p>
-              <p className="text-muted-foreground text-sm">
+            <div className="space-y-1 text-center">
+              <p className="text-lg font-semibold">No appointments yet</p>
+              <p className="text-sm text-muted-foreground">
                 Book your first appointment to get started
               </p>
             </div>
@@ -138,62 +147,57 @@ export default function History() {
             return (
               <Card
                 key={appointment.id}
-                className="hover:shadow-md transition-shadow"
+                className="overflow-hidden shadow-sm transition-shadow hover:shadow-md py-0"
               >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-2 flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-base truncate">
-                          {appointment.title}
-                        </h3>
-                        <Badge variant="outline" className={status.className}>
-                          {status.label}
-                        </Badge>
-                      </div>
+                <CardContent className="flex gap-4 p-0">
+                  {/* Status bar replaces the old inline colored div */}
+                  <div className={cn("w-1.5 shrink-0", status.barClassName)} />
 
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <div className="min-w-0 flex-1 space-y-3 py-4 pr-4 sm:py-5 sm:pr-5">
+                    {/* Title + badge */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="min-w-0 truncate font-semibold">
+                        {appointment.title}
+                      </h3>
+                      <Badge
+                        variant="outline"
+                        className={cn("shrink-0", status.badgeClassName)}
+                      >
+                        {status.label}
+                      </Badge>
+                    </div>
+
+                    {/* Meta grid — stacks on mobile, 3 cols from sm */}
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-1.5 text-sm text-muted-foreground sm:grid-cols-3">
+                      <div className="flex items-center gap-1.5">
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                         <span>
                           {concernConfig[appointment.concern] ??
                             appointment.concern}
                         </span>
                       </div>
-
-                      <div className="flex items-center gap-4 flex-wrap">
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4 flex-shrink-0" />
-                          <span>
-                            {format(new Date(appointment.date), "MMMM d, yyyy")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4 flex-shrink-0" />
-                          <span>
-                            {format(new Date(appointment.date), "h:mm a")}
-                          </span>
-                        </div>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          {format(new Date(appointment.date), "MMM d, yyyy")}
+                        </span>
                       </div>
-
-                      {appointment.description && (
-                        <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                          <FileText className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                          <p className="line-clamp-2">
-                            {appointment.description}
-                          </p>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          {format(new Date(appointment.date), "h:mm a")}
+                        </span>
+                      </div>
                     </div>
 
-                    <div
-                      className={`w-2 h-full min-h-[60px] rounded-full flex-shrink-0 ${
-                        appointment.status === "ACCEPTED"
-                          ? "bg-green-500"
-                          : appointment.status === "PENDING"
-                            ? "bg-orange-400"
-                            : "bg-red-500"
-                      }`}
-                    />
+                    {appointment.description && (
+                      <div className="flex items-start gap-1.5 rounded-lg bg-muted/50 p-2.5 text-sm text-muted-foreground">
+                        <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        <p className="line-clamp-2">
+                          {appointment.description}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

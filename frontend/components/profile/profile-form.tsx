@@ -37,6 +37,8 @@ import { format } from "date-fns";
 
 type ProfileFormValues = z.infer<typeof ProfileSchema>;
 
+const TOTAL_STEPS = 2;
+
 export const ProfileForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -55,7 +57,15 @@ export const ProfileForm = () => {
     },
   });
 
-  const nextStep = async () => {
+  // Prevent Enter-key implicit submission from firing before the final step.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && step < TOTAL_STEPS) {
+      e.preventDefault();
+    }
+  };
+
+  const nextStep = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     const fields =
       step === 1
         ? ["firstName", "lastName", "middleName", "phoneNumber"]
@@ -65,9 +75,15 @@ export const ProfileForm = () => {
     if (isValid) setStep((prev) => prev + 1);
   };
 
-  const prevStep = () => setStep((prev) => prev - 1);
+  const prevStep = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setStep((prev) => prev - 1);
+  };
 
   const onSubmit = async (data: ProfileFormValues) => {
+    // Extra safety net: never let a submit through unless we're on the last step.
+    if (step < TOTAL_STEPS) return;
+
     setIsLoading(true);
 
     try {
@@ -90,35 +106,54 @@ export const ProfileForm = () => {
   };
 
   return (
-    <div className="flex flex-col gap-y-6 sm:gap-y-8 min-h-dvh justify-center items-center px-4 sm:px-5 py-8 bg-gradient-to-br from-background to-muted/20">
-      <div className="text-center space-y-2 sm:space-y-3">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 mb-2">
-          <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-y-6 bg-gradient-to-br from-background to-muted/20 px-4 py-10 sm:gap-y-8 sm:px-6">
+      <div className="space-y-2 text-center sm:space-y-3">
+        <div className="mb-1 inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent sm:h-16 sm:w-16">
+          <User className="h-6 w-6 text-primary sm:h-8 sm:w-8" />
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold px-2">
+        <h1 className="px-2 text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
           Complete Your Profile
         </h1>
       </div>
 
       <Card className="w-full max-w-lg shadow-lg">
-        <CardHeader className="text-center space-y-2 px-4 sm:px-6">
-          <CardTitle className="text-lg sm:text-xl">
-            Step {step} of 2 •{" "}
-            {step === 1 ? "Personal Info" : "Additional Details"}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            {step === 1
-              ? "Let's start with your basic information"
-              : "Just a few more details to complete your profile"}
-          </p>
+        <CardHeader className="space-y-4 px-4 pb-2 sm:px-6">
+          {/* Step progress */}
+          <div className="flex items-center gap-2">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-1.5 flex-1 rounded-full transition-colors",
+                  i + 1 <= step ? "bg-primary" : "bg-muted",
+                )}
+              />
+            ))}
+          </div>
+
+          <div className="space-y-1 text-center">
+            <CardTitle className="text-lg sm:text-xl">
+              Step {step} of {TOTAL_STEPS} ·{" "}
+              {step === 1 ? "Personal Info" : "Additional Details"}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {step === 1
+                ? "Let's start with your basic information"
+                : "Just a few more details to complete your profile"}
+            </p>
+          </div>
         </CardHeader>
 
-        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+        <div className="px-4 pb-5 pt-2 sm:px-6 sm:pb-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              onKeyDown={handleKeyDown}
+              className="space-y-5"
+            >
               {form.formState.errors.root && (
-                <div className="flex items-center gap-3 text-destructive px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                  <Info className="h-5 w-5 flex-shrink-0" />
+                <div className="flex items-center gap-3 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-destructive">
+                  <Info className="h-5 w-5 shrink-0" />
                   <p className="text-sm">
                     {form.formState.errors.root.message}
                   </p>
@@ -127,59 +162,62 @@ export const ProfileForm = () => {
 
               {step === 1 && (
                 <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          Last Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            disabled={isLoading}
-                            placeholder="Dela Cruz"
-                            className="h-10"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          First Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            disabled={isLoading}
-                            placeholder="Juan"
-                            className="h-10"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            First Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              disabled={isLoading}
+                              placeholder="Juan"
+                              className="h-11"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            Last Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              disabled={isLoading}
+                              placeholder="Dela Cruz"
+                              className="h-11"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 flex-wrap">
+                        <FormLabel className="flex flex-wrap items-center gap-2">
                           <span className="flex items-center gap-2">
                             <User className="h-4 w-4 text-muted-foreground" />
                             Middle Name
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs font-normal text-muted-foreground">
                             (Optional)
                           </span>
                         </FormLabel>
@@ -188,7 +226,7 @@ export const ProfileForm = () => {
                             {...field}
                             disabled={isLoading}
                             placeholder="Santos"
-                            className="h-10"
+                            className="h-11"
                           />
                         </FormControl>
                         <FormMessage />
@@ -209,7 +247,7 @@ export const ProfileForm = () => {
                             {...field}
                             disabled={isLoading}
                             placeholder="09123456789"
-                            className="h-10"
+                            className="h-11"
                           />
                         </FormControl>
                         <FormMessage />
@@ -235,92 +273,97 @@ export const ProfileForm = () => {
                             {...field}
                             disabled={isLoading}
                             placeholder="123 Main St, Barangay..."
-                            className="h-10"
+                            className="h-11"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="birthDate"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel className="flex items-center gap-2">
-                          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                          Date of Birth
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "h-10 pl-3 text-left font-normal w-full",
-                                  !field.value && "text-muted-foreground",
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50 flex-shrink-0" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto p-0 max-w-[calc(100vw-2rem)]"
-                            align="start"
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="birthDate"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="flex items-center gap-2">
+                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                            Date of Birth
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className={cn(
+                                    "h-11 w-full justify-start pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground",
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto max-w-[calc(100vw-2rem)] p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date > new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                captionLayout="dropdown"
+                                fromYear={1900}
+                                toYear={new Date().getFullYear()}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            Gender
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
                           >
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date("1900-01-01")
-                              }
-                              captionLayout="dropdown"
-                              fromYear={1900}
-                              toYear={new Date().getFullYear()}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          Gender
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="h-10 w-full">
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="MALE">Male</SelectItem>
-                            <SelectItem value="FEMALE">Female</SelectItem>
-                            <SelectItem value="OTHER">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                            <FormControl>
+                              <SelectTrigger className="h-11 w-full">
+                                <SelectValue placeholder="Select gender" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="MALE">Male</SelectItem>
+                              <SelectItem value="FEMALE">Female</SelectItem>
+                              <SelectItem value="OTHER">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -330,28 +373,28 @@ export const ProfileForm = () => {
                     type="button"
                     variant="outline"
                     onClick={prevStep}
-                    className="flex-1 h-10"
+                    className="h-11 flex-1"
                     disabled={isLoading}
                   >
                     Back
                   </Button>
                 )}
 
-                {step < 2 ? (
+                {step < TOTAL_STEPS ? (
                   <Button
                     type="button"
                     onClick={nextStep}
-                    className="flex-1 h-10"
+                    className="h-11 flex-1"
                   >
                     Continue
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="flex-1 h-10"
+                    className="h-11 flex-1"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Creating..." : "Complete Profile "}
+                    {isLoading ? "Creating..." : "Complete Profile"}
                   </Button>
                 )}
               </div>

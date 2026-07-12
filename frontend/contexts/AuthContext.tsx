@@ -42,24 +42,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    let isMounted = true;
-
     const loadUser = async () => {
       try {
         await fetchUser();
       } catch {
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     loadUser();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {

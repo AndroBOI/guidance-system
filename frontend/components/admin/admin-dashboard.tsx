@@ -79,7 +79,7 @@ export default function AdminDashboard() {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Students
+                Total Users
               </CardTitle>
               <Users className="h-4 w-4 text-blue-500" />
             </CardHeader>
