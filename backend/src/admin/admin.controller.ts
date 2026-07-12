@@ -50,7 +50,7 @@ export class AdminController {
   @Patch('appointments/:id/status')
   updateAppointmentStatus(
     @Param('id') id: string,
-    @Body() body: { status: 'ACCEPTED' | 'REJECTED' },
+    @Body() body: { status: 'ACCEPTED' | 'REJECTED' | 'COMPLETED' },
     @Req() req: RequestWithUser,
   ) {
     return this.adminService.updateAppointmentStatus(

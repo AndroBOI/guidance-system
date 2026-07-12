@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/notification/dto/create-notification.dto';
@@ -63,12 +63,12 @@ export class AdminService {
   }
 
   async getDashBoardStats() {
-    const [totalStudents, totalAppointments, pendingCount, acceptedCount] =
+    const [totalStudents, totalAppointments, pendingCount, completedCount] =
       await Promise.all([
         this.prisma.user.count({ where: { role: 'USER' } }),
         this.prisma.appointment.count(),
         this.prisma.appointment.count({ where: { status: 'PENDING' } }),
-        this.prisma.appointment.count({ where: { status: 'ACCEPTED' } }),
+        this.prisma.appointment.count({ where: { status: 'COMPLETED' } }),
       ]);
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -84,16 +84,39 @@ export class AdminService {
       totalStudents,
       totalAppointments,
       pendingAppointments: pendingCount,
-      completedAppointments: acceptedCount,
+      completedAppointments: completedCount,
       todayAppointments,
     };
   }
 
   async updateAppointmentStatus(
     appointmentId: string,
-    status: 'ACCEPTED' | 'REJECTED',
+    status: 'ACCEPTED' | 'REJECTED' | 'COMPLETED',
     adminId: string,
   ) {
+    // Fetch current status before updating
+    const existing = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      select: { status: true },
+    });
+
+    if (!existing) {
+      throw new BadRequestException('Appointment not found');
+    }
+
+    // Enforce valid transition rules
+    const current = existing.status;
+    if (current === 'REJECTED' || current === 'COMPLETED') {
+      throw new BadRequestException(
+        `Cannot change status of a ${current.toLowerCase()} appointment`,
+      );
+    }
+    if (current === 'PENDING' && status === 'COMPLETED') {
+      throw new BadRequestException(
+        'Appointment must be accepted before it can be marked as completed',
+      );
+    }
+
     const appointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
@@ -115,25 +138,29 @@ export class AdminService {
       },
     });
 
-    const notifType: NotificationType =
-      status === 'ACCEPTED'
-        ? NotificationType.APPOINTMENT_ACCEPTED
-        : NotificationType.APPOINTMENT_REJECTED;
-
-    const title =
-      status === 'ACCEPTED' ? 'Appointment Accepted' : 'Appointment Rejected';
-
     const [year, month, day] = appointment.date.split('-').map(Number);
     const [hours, minutes] = appointment.time.split(':').map(Number);
     const dateObj = new Date(year, month - 1, day, hours, minutes);
-
     const appointmentDate = format(dateObj, 'MMMM d, yyyy');
     const appointmentTime = format(dateObj, 'h:mm a');
 
-    const message =
-      status === 'ACCEPTED'
-        ? `Your appointment "${appointment.title}" has been accepted for ${appointmentDate} at ${appointmentTime}`
-        : `Your appointment "${appointment.title}" was not approved`;
+    let notifType: NotificationType;
+    let title: string;
+    let message: string;
+
+    if (status === 'ACCEPTED') {
+      notifType = NotificationType.APPOINTMENT_ACCEPTED;
+      title = 'Appointment Accepted';
+      message = `Your appointment "${appointment.title}" has been accepted for ${appointmentDate} at ${appointmentTime}`;
+    } else if (status === 'REJECTED') {
+      notifType = NotificationType.APPOINTMENT_REJECTED;
+      title = 'Appointment Rejected';
+      message = `Your appointment "${appointment.title}" was not approved`;
+    } else {
+      notifType = NotificationType.APPOINTMENT_COMPLETED;
+      title = 'Appointment Completed';
+      message = `Your appointment "${appointment.title}" on ${appointmentDate} at ${appointmentTime} has been marked as completed`;
+    }
 
     await this.notificationService.create(
       appointment.userId,

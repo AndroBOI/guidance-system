@@ -17,6 +17,7 @@ enum AppointmentStatus {
   PENDING
   ACCEPTED
   REJECTED
+  COMPLETED
 }
 
 enum Concern {
@@ -36,6 +37,7 @@ enum Gender {
 enum NotificationType {
   APPOINTMENT_ACCEPTED
   APPOINTMENT_REJECTED
+  APPOINTMENT_COMPLETED
   APPOINTMENT_REMINDER
   SYSTEM
 }
