@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -22,6 +28,7 @@ import {
 import { format } from "date-fns";
 import api from "@/lib/api";
 
+const POLL_INTERVAL_MS = 5_000; // 10s — tune as needed
 
 interface DashboardStats {
   totalStudents: number;
@@ -33,8 +40,8 @@ interface DashboardStats {
 interface Appointment {
   id: string;
   title: string;
-  date: string;   
-  time: string;  
+  date: string;
+  time: string;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
   user: {
     email: string;
@@ -57,12 +64,64 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [pendingAppointments, setPendingAppointments] = useState<Appointment[]>([]);
+  const [pendingAppointments, setPendingAppointments] = useState<Appointment[]>(
+    [],
+  );
   const [todaySchedule, setTodaySchedule] = useState<Appointment[]>([]);
   const [recentSignups, setRecentSignups] = useState<UserRecord[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [statsError, setStatsError] = useState(false);
+
+  // Tracks whether the initial load has happened, so polling ticks
+  // don't re-trigger the full-page spinner every 10s.
+  const hasLoadedOnce = useRef(false);
+
+  const fetchAll = useCallback(async () => {
+    if (!hasLoadedOnce.current) {
+      setLoading(true);
+    }
+    setStatsError(false);
+
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+
+    const [statsResult, appointmentsResult, usersResult] =
+      await Promise.allSettled([
+        api.get<DashboardStats>("/admin/dashboard/stats"),
+        api.get<Appointment[]>("/admin/appointments"),
+        api.get<UserRecord[]>("/admin/users"),
+      ]);
+
+    if (statsResult.status === "fulfilled") {
+      setStats(statsResult.value.data);
+    } else {
+      console.error("Error fetching stats:", statsResult.reason);
+      setStatsError(true);
+    }
+
+    if (appointmentsResult.status === "fulfilled") {
+      const all = appointmentsResult.value.data;
+
+      const pending = all.filter((a) => a.status === "PENDING").slice(0, 5);
+      setPendingAppointments(pending);
+
+      const today = all
+        .filter((a) => a.date === todayStr && a.status !== "REJECTED")
+        .sort((a, b) => a.time.localeCompare(b.time));
+      setTodaySchedule(today);
+    } else {
+      console.error("Error fetching appointments:", appointmentsResult.reason);
+    }
+
+    if (usersResult.status === "fulfilled") {
+      setRecentSignups(usersResult.value.data.slice(0, 5));
+    } else {
+      console.error("Error fetching users:", usersResult.reason);
+    }
+
+    hasLoadedOnce.current = true;
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,56 +135,14 @@ export default function AdminDashboard() {
     }
 
     if (user?.role !== "ADMIN") return;
-
-    const fetchAll = async () => {
-      setLoading(true);
-      setStatsError(false);
-
-      const todayStr = format(new Date(), "yyyy-MM-dd");
-
-      const [statsResult, appointmentsResult, usersResult] = await Promise.allSettled([
-        api.get<DashboardStats>("/admin/dashboard/stats"),
-        api.get<Appointment[]>("/admin/appointments"),
-        api.get<UserRecord[]>("/admin/users"),
-      ]);
-
-      // Stats
-      if (statsResult.status === "fulfilled") {
-        setStats(statsResult.value.data);
-      } else {
-        console.error("Error fetching stats:", statsResult.reason);
-        setStatsError(true);
-      }
-
-      // Appointments → pending list + today's schedule
-      if (appointmentsResult.status === "fulfilled") {
-        const all = appointmentsResult.value.data;
-
-        const pending = all
-          .filter((a) => a.status === "PENDING")
-          .slice(0, 5);
-        setPendingAppointments(pending);
-
-        const today = all
-          .filter((a) => a.date === todayStr && a.status !== "REJECTED")
-          .sort((a, b) => a.time.localeCompare(b.time));
-        setTodaySchedule(today);
-      } else {
-        console.error("Error fetching appointments:", appointmentsResult.reason);
-      }
-
-      // Users → recent signups (already sorted desc by backend)
-      if (usersResult.status === "fulfilled") {
-        setRecentSignups(usersResult.value.data.slice(0, 5));
-      } else {
-        console.error("Error fetching users:", usersResult.reason);
-      }
-
-      setLoading(false);
-    };
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetch, setState happens post-await, not synchronously
     fetchAll();
-  }, [user, authLoading, router]);
+
+    // Poll in the background while this page stays mounted
+    const intervalId = setInterval(fetchAll, POLL_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+  }, [user, authLoading, router, fetchAll]);
 
   if (authLoading || loading) {
     return (
@@ -137,7 +154,6 @@ export default function AdminDashboard() {
 
   const firstName = user?.email?.split("@")[0] ?? "Admin";
 
-  // Helper: get display name from an appointment's user
   const getStudentName = (appt: Appointment) => {
     const p = appt.user?.profile;
     if (p?.firstName || p?.lastName) {
@@ -149,17 +165,15 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto w-full max-w-6xl space-y-6 md:space-y-8">
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
             Welcome back, <span className="capitalize">{firstName}</span>
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Here's what's happening across the system today.
+            Here&apos;s what&apos;s happening across the system today.
           </p>
         </div>
 
-        {/* Stats error banner */}
         {statsError && (
           <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
@@ -167,7 +181,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* KPI Cards */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <Card className="shadow-sm border-primary/30 bg-primary/5">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -191,7 +204,7 @@ export default function AdminDashboard() {
           <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm">
-                Today's Sessions
+                Today&apos;s Sessions
               </CardTitle>
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent">
                 <Clock className="h-3.5 w-3.5 text-primary" />
@@ -245,11 +258,12 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Needs attention — pending requests */}
           <Card className="shadow-sm lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-base">Needs Your Attention</CardTitle>
+                <CardTitle className="text-base">
+                  Needs Your Attention
+                </CardTitle>
                 <CardDescription>Pending appointment requests</CardDescription>
               </div>
               <Button
@@ -269,7 +283,7 @@ export default function AdminDashboard() {
                     <Inbox className="h-5 w-5 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Nothing pending — you're all caught up
+                    Nothing pending — you&apos;re all caught up
                   </p>
                 </div>
               ) : (
@@ -301,7 +315,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Quick actions */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="text-base">Quick Actions</CardTitle>
@@ -337,10 +350,9 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Today's schedule */}
           <Card className="shadow-sm lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-base">Today's Schedule</CardTitle>
+              <CardTitle className="text-base">Today&apos;s Schedule</CardTitle>
               <CardDescription>
                 {format(new Date(), "EEEE, MMMM d, yyyy")}
               </CardDescription>
@@ -357,7 +369,6 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 todaySchedule.map((appt, idx) => {
-                  // Parse "HH:mm" safely without timezone shifting
                   const [hours, minutes] = appt.time.split(":").map(Number);
                   const timeObj = new Date();
                   timeObj.setHours(hours, minutes, 0, 0);
@@ -395,7 +406,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Recent signups */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="text-base">Recent Signups</CardTitle>
